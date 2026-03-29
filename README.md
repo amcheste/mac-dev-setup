@@ -1,26 +1,172 @@
-# Alan's Development Environment
+# dev_env
 
-This project provides the ability for me to quickly setup a development environment on a Mac OSX.
+Personal developer environment for macOS — managed as a Homebrew tap.
 
-## Setup
+One command installs all CLI tools, GUI apps, dotfiles, and prompts for credentials.
 
-To install the development environment execute `./setup.sh`.
+---
 
-This script will create the desired repo structure and install depedencies using homebrew.
+## Quick Start
 
-### .vim
+```bash
+# 1. Clone the repo
+git clone https://github.com/amcheste/dev_env ~/Repos/amcheste/dev_env
+cd ~/Repos/amcheste/dev_env
 
-The following will override your `.vimrc`:
-`$ cp etc/vimrc ~/.vimrc`
+# 2. Run setup (installs Homebrew if needed, then everything else)
+bash setup.sh
+```
 
-### .zsh
+That's it. Setup will:
+- Install [Homebrew](https://brew.sh) if not already present
+- Tap this repo (`amcheste/dev-env`)
+- Install all packages from `Brewfile` (CLI tools + GUI apps)
+- Symlink `~/.zshrc` and `~/.vimrc` from `dotfiles/`
+- Install [vim-plug](https://github.com/junegunn/vim-plug) and all Vim plugins
+- Run the credential wizard to populate `~/.secrets`
 
-The follwoing will override your `.zshrc`:
-`$ cp etc/zshrc ~/.zshrc`
+---
+
+## Homebrew Tap
+
+Once the tap is added you can also install the formula directly:
+
+```bash
+brew tap amcheste/dev-env https://github.com/amcheste/dev_env
+brew install --HEAD amcheste/dev-env/dev-tools
+```
+
+Or install individual packages from the `Brewfile`:
+
+```bash
+brew bundle --file=~/Repos/amcheste/dev_env/Brewfile
+```
+
+---
+
+## What's Installed
+
+### CLI Tools
+| Tool | Purpose |
+|------|---------|
+| `git`, `gh` | Version control + GitHub CLI |
+| `vim`, `fzf`, `ripgrep`, `fd`, `bat` | Editor + search utilities |
+| `tmux` | Terminal multiplexer |
+| `jq` | JSON processor |
+| `wget`, `tree` | Misc utilities |
+
+### Languages
+| Tool | Purpose |
+|------|---------|
+| `go` | Go language |
+| `pyenv` | Python version manager |
+| `nvm` | Node version manager |
+| `openjdk`, `maven` | Java + build tool |
+
+### Cloud & DevOps
+| Tool | Purpose |
+|------|---------|
+| `kubectl` | Kubernetes CLI |
+| `kind` | Local k8s clusters |
+| `helm` | Kubernetes package manager |
+| `terraform` | Infrastructure as code |
+| `oci-cli` | Oracle Cloud CLI |
+| `doctl` | DigitalOcean CLI |
+
+### Databases
+| Tool | Purpose |
+|------|---------|
+| `mongosh` | MongoDB shell |
+
+### GUI Apps (Casks)
+- **iTerm2** — terminal
+- **Cursor** — AI-powered editor
+- **Docker Desktop** — containers
+- **GoLand**, **IntelliJ IDEA**, **PyCharm** — JetBrains IDEs
+- **MongoDB Compass** — database GUI
+- **Meslo LG Nerd Font** — powerline-compatible font
+
+---
+
+## Dotfiles
+
+Dotfiles live in `dotfiles/` and are symlinked into `$HOME` by `scripts/install-dotfiles.sh`.
+
+| File | Destination | Notes |
+|------|-------------|-------|
+| `dotfiles/zshrc` | `~/.zshrc` | Shell config, aliases, PATH setup |
+| `dotfiles/vimrc` | `~/.vimrc` | Full Vim config with plugins |
+| `dotfiles/secrets.template` | `~/.secrets` | Credential template (on first install) |
+
+To re-install dotfiles only:
+```bash
+bash scripts/install-dotfiles.sh
+```
+
+---
+
+## Credentials
+
+Secrets live in `~/.secrets` (chmod 600, never committed).
+
+To re-run the credential wizard:
+```bash
+bash scripts/setup-credentials.sh
+```
+
+The wizard configures:
+- `ANTHROPIC_API_KEY` — for Claude Code
+- `OCIR_TOKEN`, `OCIR_REGION`, `OCIR_NAMESPACE` — Oracle Cloud Registry
+- `DIGITAL_OCEAN_TOKEN` — DigitalOcean / doctl
+- `DB_PASSWORD` — default database password
+
+---
+
+## Updating
+
+```bash
+cd ~/Repos/amcheste/dev_env
+git pull
+brew bundle --file=Brewfile --no-lock   # install any new packages
+bash scripts/install-dotfiles.sh        # re-link dotfiles if changed
+```
+
+---
 
 ## Manual Steps
 
-You must still manually install:
-* Docker Desktop
-* VS Code
-* Git
+A few things can't be automated:
+- **OCI CLI config** — run `oci setup config` after install
+- **Vim plugins** — run `vim +PlugInstall +qall` on first open (setup.sh does this automatically)
+- **gh auth** — `gh auth login` (setup-credentials.sh handles this)
+
+---
+
+## Repo Structure
+
+```
+dev_env/
+├── Formula/
+│   └── dev-tools.rb          # Homebrew formula
+├── dotfiles/
+│   ├── zshrc                 # Shell config
+│   ├── vimrc                 # Vim config
+│   └── secrets.template      # Credential template
+├── scripts/
+│   ├── install-dotfiles.sh   # Symlinks dotfiles into $HOME
+│   └── setup-credentials.sh  # Interactive credential wizard
+├── etc/
+│   └── Default.json          # iTerm2 color profile
+├── Brewfile                  # All packages (brew bundle)
+├── setup.sh                  # Bootstrap entry point
+└── README.md
+```
+
+---
+
+## iTerm2 Color Profile
+
+Import `etc/Default.json` in iTerm2:
+> Preferences → Profiles → Other Actions → Import JSON Profiles
+
+Uses **Meslo LG Nerd Font** (installed by the Brewfile).
