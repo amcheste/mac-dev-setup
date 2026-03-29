@@ -49,8 +49,11 @@ jobs:
 
       - name: Audit formula style and correctness
         run: |
-          brew audit --strict Formula/dev-tools.rb
-          brew style Formula/dev-tools.rb
+          # brew audit/style no longer accept file paths — must use formula name.
+          # Tap the local checkout so we can reference it by name.
+          brew tap amcheste/dev-env "$(pwd)"
+          brew audit --strict amcheste/dev-env/dev-tools
+          brew style amcheste/dev-env/dev-tools
 
   # ── Job 3: Integration test (macOS, CLI tools only) ────────────────────────
   integration:

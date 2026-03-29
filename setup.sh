@@ -35,6 +35,7 @@ if ! command -v brew &>/dev/null; then
     # Add brew to PATH for Apple Silicon
     if [[ -f /opt/homebrew/bin/brew ]]; then
         eval "$(/opt/homebrew/bin/brew shellenv)"
+        # shellcheck disable=SC2016  # single quotes intentional: writing literal string to file
         echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> "$HOME/.zprofile"
     fi
 else
