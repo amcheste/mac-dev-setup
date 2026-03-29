@@ -17,8 +17,8 @@ section() {
 
 check() {
   local desc="$1"
-  shift
-  if eval "$@" &>/dev/null; then
+  local cmd="$2"
+  if bash -c "$cmd" &>/dev/null; then
     echo "  ✓ $desc"
     PASS=$((PASS + 1))
   else
@@ -36,14 +36,16 @@ check "brew is on PATH" "command -v brew"
 # ── Dotfiles ───────────────────────────────────────────────────────────────────
 
 section "Dotfiles"
-check "~/.zshrc is a symlink" "test -L ~/.zshrc"
-check "~/.vimrc is a symlink" "test -L ~/.vimrc"
+check "$HOME/.zshrc is a symlink" "test -L $HOME/.zshrc"
+check "$HOME/.vimrc is a symlink" "test -L $HOME/.vimrc"
 
 # ── Secrets ────────────────────────────────────────────────────────────────────
 
 section "Secrets"
-check "~/.secrets exists" "test -f ~/.secrets"
-check "~/.secrets permissions are 0600" '[[ "$(stat -f "%Mp%Lp" ~/.secrets)" == "0600" ]]'
+check "$HOME/.secrets exists" "test -f $HOME/.secrets"
+# shellcheck disable=SC2016
+check "$HOME/.secrets permissions are 0600" \
+  '[[ "$(stat -f \"%Mp%Lp\" '"$HOME"'/.secrets)" == "0600" ]]'
 
 # ── Tools ──────────────────────────────────────────────────────────────────────
 
@@ -56,8 +58,8 @@ done
 # ── Shell environment ──────────────────────────────────────────────────────────
 
 section "Shell"
-check "~/Repos directory exists" "test -d ~/Repos"
-check "~/.zshrc is present" "test -f ~/.zshrc"
+check "$HOME/Repos directory exists" "test -d $HOME/Repos"
+check "$HOME/.zshrc is present" "test -f $HOME/.zshrc"
 
 # ── Summary ────────────────────────────────────────────────────────────────────
 
