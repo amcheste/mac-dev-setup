@@ -1,222 +1,94 @@
-#!/bin/sh
-
+#!/usr/bin/env bash
+# setup.sh — Bootstrap script for the developer environment.
+# Installs Homebrew (if needed), taps this repo, runs brew bundle,
+# symlinks dotfiles, and sets up credentials.
 #
-# Constants
+# Usage (fresh machine):
+#   git clone https://github.com/amcheste/mac-dev-setup ~/Repos/amcheste/mac-dev-setup
+#   cd ~/Repos/amcheste/mac-dev-setup && bash setup.sh
+set -euo pipefail
+
+REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# ── Constants ────────────────────────────────────────────────────────────────
 FAILED=1
-SUCCESS=1
+SUCCESS=0
 
-echo "Setting up development environment, please stand by..."
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo "  Developer Environment Setup"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo ""
 
-#
-# Create directory for git repos
-if [[ ! -d ~/Repos ]]
-then
-    echo "~/Repos does not exist creating..."
-    mkdir ~/Repos
-    if  [[ $? -ne  0 ]];  then
-        echo  "ERROR:  Failed to create directory ~/Repos"
-        exit $FAILED
+# ── Repos directory ──────────────────────────────────────────────────────────
+if [[ ! -d "$HOME/Repos" ]]; then
+    echo "▶ Creating ~/Repos..."
+    mkdir -p "$HOME/Repos"
+fi
+
+# ── Homebrew ─────────────────────────────────────────────────────────────────
+echo "▶ Checking Homebrew..."
+if ! command -v brew &>/dev/null; then
+    echo "  Installing Homebrew..."
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" \
+        || { echo "ERROR: Failed to install Homebrew"; exit $FAILED; }
+
+    # Add brew to PATH for Apple Silicon
+    if [[ -f /opt/homebrew/bin/brew ]]; then
+        eval "$(/opt/homebrew/bin/brew shellenv)"
+        # shellcheck disable=SC2016  # single quotes intentional: writing literal string to file
+        echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> "$HOME/.zprofile"
     fi
+else
+    echo "  Homebrew already installed ✓"
 fi
 
-#
-# Install homebrew
-echo "Checking for homebrew..."
-which brew > /dev/null
-if [[ $? -ne 0 ]]; then
-    echo "Installing homebrew..."
-    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-    if [[ $? -ne  0 ]]; then
-        echo "ERROR: Failed to install homebrew"
-        exit $FAILED
-    fi
-    (echo; echo 'eval "$(/opt/homebrew/bin/brew shellenv)"') >> /Users/achester/.zprofile
-    eval "$(/opt/homebrew/bin/brew shellenv)"
-	
+# ── Tap this repo ────────────────────────────────────────────────────────────
+echo ""
+echo "▶ Tapping amcheste/mac-dev-setup..."
+brew tap amcheste/mac-dev-setup https://github.com/amcheste/mac-dev-setup 2>/dev/null || true
+
+# ── Brew Bundle ──────────────────────────────────────────────────────────────
+echo ""
+echo "▶ Installing packages (this may take a few minutes)..."
+brew bundle --file="$REPO_DIR/Brewfile" \
+    || { echo "ERROR: brew bundle failed"; exit $FAILED; }
+
+# ── Dotfiles ─────────────────────────────────────────────────────────────────
+echo ""
+echo "▶ Installing dotfiles..."
+bash "$REPO_DIR/scripts/install-dotfiles.sh" \
+    || { echo "ERROR: Failed to install dotfiles"; exit $FAILED; }
+
+# ── Vim plugins ──────────────────────────────────────────────────────────────
+echo ""
+echo "▶ Installing Vim plugins..."
+if [[ -f "$HOME/.vim/autoload/plug.vim" ]]; then
+    vim +PlugInstall +qall 2>/dev/null && echo "  Vim plugins installed ✓" \
+        || echo "  Warning: vim +PlugInstall had errors (plugins may still be installed)"
+else
+    echo "  vim-plug not found — skipping (run: install-dotfiles.sh first)"
 fi
 
-#
-# Install Go for development
-echo "Checking for go..."
-brew list go > /dev/null
-if [[ $? -ne 0 ]]; then
-    echo "Installing go..."
-    brew install go
-    if [[ $? -ne 0 ]]; then
-        echo "ERROR: Failed to install go"
-        exit $FAILED
-    fi
+# ── Credentials ──────────────────────────────────────────────────────────────
+echo ""
+echo "▶ Setting up credentials..."
+if [[ ! -f "$HOME/.secrets" ]] || ! grep -q 'ANTHROPIC_API_KEY="..*"' "$HOME/.secrets" 2>/dev/null; then
+    bash "$REPO_DIR/scripts/setup-credentials.sh"
+else
+    echo "  ~/.secrets already configured ✓"
 fi
 
-#
-# Install python for development
-echo "Checking for python3..."
-brew list python@3.10 > /dev/null
-if [[ $? -ne 0 ]]; then
-    echo "Installing python3..."
-    brew install python3
-    if  [[ $? -ne 0 ]]; then
-        echo "ERROR: Failed to install python3"
-        exit $FAILED
-    fi  
-fi
-
-#
-# Install virtual env
-echo "Checking for virtualenv..."
-brew list virtualenv > /dev/null
-if [[ $? -ne 0 ]]; then
-    echo "Installing virtualenv..."
-    brew install virtualenv
-    if [[ $? -ne 0 ]]; then
-        echo "ERROR: Failed to install virtualenv"
-        exit $FAILED
-    fi
-fi
-
-#
-# Install openjdk for Java development
-echo "Checking for opensdk..."
-brew list openjdk > /dev/null
-if [[ $? -ne 0 ]]; then
-    echo "Installing openjdk..."
-    brew install openjdk
-    if [[ $? -ne 0 ]]; then
-        echo "ERROR: Failed to install openjdk"
-        exit $FAILED
-    fi
-fi
-
-#
-# Install maven for java packages
-echo "Checking for maven..."
-brew list maven > /dev/null
-if [[ $? -ne 0 ]]; then 
-    echo "Installing maven..."
-    brew install maven
-    if [[ $? -ne 0 ]]; then
-        echo "ERROR: Failed to install maven"
-        exit $FAILED
-    fi
-fi
-
-#
-# Install kind for local k8s development
-echo "Checking for kind..."
-brew list kind > /dev/null
-if [[ $? -ne 0 ]]; then
-    echo "Installing kind..."
-    brew install kind
-    if [[ $? -ne 0 ]]; then
-        echo "ERROR: Failed to install kind"
-        exit $FAILED
-    fi
-fi
-
-#
-# Install kubectl
-echo "Checking for kubectl..."
-brew list kubernetes-cli > /dev/null
-if [[ $? -ne 0 ]]; then
-    echo "Installing kubernetes-cli..."
-    brew install kubernetes-cli
-    if [[ $? -ne 0 ]]; then
-        echo "ERROR: Failed to install kubectl"
-        exit $FAILED
-    fi
-fi
-
-#
-# Install octant to visulaize k8s deployments
-echo "Checking for octant..."
-brew list octant > /dev/null
-if [[ $? -ne 0 ]]; then
-    echo "Installing octant..."
-    brew install octant
-    if [[ $? -ne 0 ]]; then
-        echo "ERROR: Failed to install octant"
-        exit $FAILED
-    fi
-fi
-
-#
-# Install operator-sdk for k8s operator development
-#echo "Checking for operator-sdk..."
-#brew list operator-sdk > /dev/null
-#if [[ $? -ne 0 ]]; then
-#    echo "Installing operator-sdk..."
-#    brew install operator-sdk
-#    if [[ $? -ne 0 ]]; then
-#        echo "ERROR: Failed to install operator-sdk"
-#        exit $FAILED
-#    fi
-#fi
-
-#
-# Install oci cli
-echo "Checking for oci-cli..."
-brew list oci-cli > /dev/null
-if [[ $? -ne 0 ]]; then
-    echo "Installing oci-cli..."
-    brew install oci-cli
-    if [[ $? -ne 0 ]]; then
-        echo "ERROR: Failed to install oci cli"
-        exit $FAILED
-    fi
-fi
-
-#
-# Install doctl cli
-#echo "Checking for digital ocean cli..."
-#brew list doctl > /dev/null
-#if [[ $? -ne 0 ]]; then
-#    echo "Installing doctl..."
-#    brew install doctl
-#    if [[ $? -ne 0 ]]; then
-#        echo "ERROR: Failed to install doctl"
-#        exit $FAILED
-#    fi
-#fi
-
-#
-# Install jq for json parsing
-echo "Checking for jq..."
-brew list jq > /dev/null
-if [[ $? -ne 0 ]]; then
-    echo "Installing jq..."
-    brew install jq
-    if [[ $? -ne 0 ]]; then
-        echo "ERROR: Failed to install jq"
-        exit $FAILED
-    fi
-fi
-
-#
-# Installing terraform
-#echo "Checking for terraform..."
-#brew list terraform > /dev/null
-#if [[ $? -ne 0 ]]; then
-#    echo "Installing terraform..."
-#    brew install terraform
-#    if [[ $? -ne 0 ]]; then
-#        echo "ERROR: Failed to install terraform"
-#        exit $FAILED
-#    fi
-#fi
-
-#
-# Install gator for gatekeeper development
-#echo "Checking for gator..."
-#brew list gator > /dev/null
-#if [[ $? -ne 0 ]]; then
-#    echo "Installing gator..."
-#    brew install gator
-#    if [[ $? -ne 0 ]];  then
-#        echo "ERROR: Failed to install gator"
-#        exit $FAILED
-#    fi
-#fi
-
-echo "Environment has been setup!"
+# ── Done ─────────────────────────────────────────────────────────────────────
+echo ""
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo "  Setup complete!"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo ""
+echo "  Restart your terminal, or run:  source ~/.zshrc"
+echo ""
+echo "  Optional next steps:"
+echo "    brew install --HEAD amcheste/mac-dev-setup/dev-tools"
+echo "    (installs the formula version with caveats and test support)"
+echo ""
 
 exit $SUCCESS

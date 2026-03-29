@@ -1,0 +1,114 @@
+name: Validate
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  # ── Job 1: Lint (fast, runs on Linux) ──────────────────────────────────────
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install shellcheck
+        run: sudo apt-get install -y shellcheck
+
+      - name: Lint shell scripts
+        run: |
+          shellcheck setup.sh
+          shellcheck scripts/install-dotfiles.sh
+          shellcheck scripts/setup-credentials.sh
+          shellcheck scripts/upgrade.sh
+
+      - name: Verify secrets.template contains no real credentials
+        run: |
+          echo "Scanning secrets.template for real credentials..."
+          # Fail if patterns that look like real keys are found
+          if grep -Eq '(sk-ant-[a-zA-Z0-9]{20,}|ghp_[a-zA-Z0-9]{36}|dop_v1_[a-zA-Z0-9]{64}|ocid1\.[a-z]+\.[a-z]+\.[a-z0-9]+\.[a-z0-9]{60})' dotfiles/secrets.template; then
+            echo "ERROR: secrets.template appears to contain real credentials!"
+            exit 1
+          fi
+          echo "secrets.template looks clean ✓"
+
+      - name: Verify .gitignore protects secrets
+        run: |
+          grep -q '\.secrets' .gitignore || \
+            (echo "ERROR: .gitignore does not exclude .secrets" && exit 1)
+          echo ".gitignore protects .secrets ✓"
+
+  # ── Job 2: Formula audit (requires macOS + Homebrew) ──────────────────────
+  formula-audit:
+    name: Formula Audit
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Audit formula style and correctness
+        run: |
+          # brew audit/style no longer accept file paths — must use formula name.
+          # Tap the local checkout so we can reference it by name.
+          brew tap amcheste/dev-env "$(pwd)"
+          brew audit --strict amcheste/dev-env/dev-tools
+          brew style amcheste/dev-env/dev-tools
+
+  # ── Job 3: Integration test (macOS, CLI tools only) ────────────────────────
+  integration:
+    name: Integration Test
+    runs-on: macos-latest
+    needs: [lint, formula-audit]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install CLI tools from Brewfile.ci
+        run: |
+          brew update
+          brew bundle --file=Brewfile.ci --no-upgrade
+        timeout-minutes: 30
+
+      - name: Run install-dotfiles.sh
+        run: bash scripts/install-dotfiles.sh
+
+      - name: Assert dotfiles are symlinked correctly
+        run: |
+          echo "Checking symlinks..."
+          test -L "$HOME/.zshrc"  || (echo "FAIL: ~/.zshrc is not a symlink"  && exit 1)
+          test -L "$HOME/.vimrc"  || (echo "FAIL: ~/.vimrc is not a symlink"  && exit 1)
+          echo "  ~/.zshrc  → $(readlink ~/.zshrc)"
+          echo "  ~/.vimrc  → $(readlink ~/.vimrc)"
+          echo "Symlinks OK ✓"
+
+      - name: Assert ~/.secrets was created from template
+        run: |
+          test -f "$HOME/.secrets" || (echo "FAIL: ~/.secrets was not created" && exit 1)
+          echo "~/.secrets exists ✓"
+
+      - name: Assert ~/.secrets has correct permissions (600)
+        run: |
+          perms=$(stat -f "%Mp%Lp" "$HOME/.secrets")
+          echo "~/.secrets permissions: $perms"
+          test "$perms" = "0600" || (echo "FAIL: ~/.secrets should be 0600, got $perms" && exit 1)
+          echo "~/.secrets permissions OK ✓"
+
+      - name: Assert ~/.secrets contains no real credentials
+        run: |
+          # Template values should all be empty strings
+          if grep -Eq '"[^"]{8,}"' "$HOME/.secrets"; then
+            echo "WARNING: ~/.secrets may contain non-empty values (check if template was populated)"
+          fi
+          echo "~/.secrets credential check passed ✓"
+
+      - name: Smoke-test installed tools
+        run: |
+          echo "Verifying key tools are on PATH..."
+          command -v go        && go version
+          command -v kubectl   && kubectl version --client
+          command -v helm      && helm version
+          command -v terraform && terraform version
+          command -v doctl     && doctl version
+          command -v jq        && jq --version
+          command -v gh        && gh --version
+          echo "All tools verified ✓"

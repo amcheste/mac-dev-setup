@@ -1,0 +1,146 @@
+" ── Core Settings ─────────────────────────────────────────────────────────
+set background=dark
+set expandtab
+set tabstop=4
+set shiftwidth=4
+set number
+set relativenumber
+set ruler
+set cursorline
+set colorcolumn=100
+set scrolloff=8
+set wildmenu
+set incsearch
+set hlsearch
+set ignorecase
+set smartcase
+set splitbelow
+set splitright
+set autoindent
+set smartindent
+set backspace=indent,eol,start
+set encoding=utf-8
+set hidden
+set noswapfile
+set nobackup
+set undofile
+syntax on
+filetype plugin indent on
+
+" ── Leader Key ─────────────────────────────────────────────────────────────
+let mapleader = " "
+
+" ── Split Navigation ───────────────────────────────────────────────────────
+nnoremap <C-h> <C-w>h
+nnoremap <C-j> <C-w>j
+nnoremap <C-k> <C-w>k
+nnoremap <C-l> <C-w>l
+
+" ── Buffer Navigation ──────────────────────────────────────────────────────
+nnoremap <leader>bn :bnext<CR>
+nnoremap <leader>bp :bprev<CR>
+nnoremap <leader>bd :bdelete<CR>
+
+" ── Leader Shortcuts ───────────────────────────────────────────────────────
+nnoremap <leader>w :w<CR>
+nnoremap <leader>q :q<CR>
+nnoremap <leader>/ :nohlsearch<CR>
+nnoremap <leader>e :NERDTreeToggle<CR>
+nnoremap <leader>f :Files<CR>
+nnoremap <leader>g :GFiles<CR>
+nnoremap <leader>b :Buffers<CR>
+nnoremap <leader>r :Rg<CR>
+
+" ── Filetype Settings ──────────────────────────────────────────────────────
+" Go — real tabs (gofmt standard)
+autocmd FileType go setlocal noexpandtab tabstop=4 shiftwidth=4
+
+" Python — PEP8 / Black (88-char line)
+autocmd FileType python setlocal expandtab tabstop=4 shiftwidth=4 colorcolumn=88
+
+" YAML / JSON / Terraform — 2-space indent
+autocmd FileType yaml,json,terraform,tf setlocal expandtab tabstop=2 shiftwidth=2
+
+" Markdown — soft wrap + spellcheck
+autocmd FileType markdown setlocal wrap linebreak spell spelllang=en_us colorcolumn=
+
+" ── vim-plug ───────────────────────────────────────────────────────────────
+" Install vim-plug if not present:
+"   curl -fLo ~/.vim/autoload/plug.vim --create-dirs \
+"     https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+call plug#begin('~/.vim/plugged')
+
+" Navigation
+Plug 'preservim/nerdtree'
+Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
+Plug 'junegunn/fzf.vim'
+
+" Git
+Plug 'tpope/vim-fugitive'
+Plug 'airblade/vim-gitgutter'
+
+" Editing
+Plug 'tpope/vim-commentary'
+Plug 'tpope/vim-surround'
+Plug 'tpope/vim-repeat'
+Plug 'jiangmiao/auto-pairs'
+
+" Status line
+Plug 'itchyny/lightline.vim'
+
+" Language — Go
+Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
+
+" Language — Terraform
+Plug 'hashivim/vim-terraform'
+
+" Language — Markdown
+Plug 'preservim/vim-markdown'
+
+" Linting / Fixing
+Plug 'dense-analysis/ale'
+
+" Theme
+Plug 'morhetz/gruvbox'
+
+call plug#end()
+
+" ── Theme ──────────────────────────────────────────────────────────────────
+let g:gruvbox_contrast_dark = 'medium'
+colorscheme gruvbox
+
+" ── Lightline ──────────────────────────────────────────────────────────────
+set laststatus=2
+set noshowmode
+let g:lightline = { 'colorscheme': 'gruvbox' }
+
+" ── ALE (linting & fixing) ─────────────────────────────────────────────────
+let g:ale_fix_on_save = 1
+let g:ale_linters = {
+\   'go':        ['gopls'],
+\   'python':    ['flake8', 'mypy'],
+\   'terraform': ['tflint'],
+\}
+let g:ale_fixers = {
+\   '*':         ['remove_trailing_lines', 'trim_whitespace'],
+\   'go':        ['goimports'],
+\   'python':    ['black', 'isort'],
+\   'terraform': ['terraform'],
+\}
+
+" ── vim-go ─────────────────────────────────────────────────────────────────
+let g:go_fmt_command        = "goimports"
+let g:go_highlight_types    = 1
+let g:go_highlight_fields   = 1
+let g:go_highlight_functions = 1
+let g:go_highlight_function_calls = 1
+
+" ── vim-terraform ──────────────────────────────────────────────────────────
+let g:terraform_fmt_on_save = 1
+let g:terraform_align       = 1
+
+" ── NERDTree ───────────────────────────────────────────────────────────────
+let g:NERDTreeShowHidden = 1
+" Close vim if NERDTree is the only window left
+autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree")
+    \ && b:NERDTree.isTabTree()) | q | endif

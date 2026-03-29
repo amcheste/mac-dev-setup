@@ -1,0 +1,61 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  # ── Gate: run full validation before cutting a release ────────────────────
+  validate:
+    name: Validate Before Release
+    uses: ./.github/workflows/validate.yml
+
+  # ── Create GitHub Release ─────────────────────────────────────────────────
+  release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    needs: validate
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Verify tag matches formula version
+        run: |
+          TAG="${GITHUB_REF_NAME}"                           # e.g. v1.2.0
+          VERSION="${TAG#v}"                                 # strip leading 'v'
+          FORMULA_VERSION=$(grep '^\s*version ' Formula/dev-tools.rb \
+            | head -1 | sed 's/.*version[[:space:]]*"//;s/".*//')
+
+          if [[ -z "$FORMULA_VERSION" ]]; then
+            echo "NOTE: Formula uses 'head' — no version string to match. Skipping version check."
+          elif [[ "$FORMULA_VERSION" != "$VERSION" ]]; then
+            echo "ERROR: Tag $TAG does not match formula version $FORMULA_VERSION"
+            exit 1
+          else
+            echo "Tag matches formula version: $VERSION ✓"
+          fi
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          body: |
+            ## Installation
+
+            ```bash
+            git clone https://github.com/amcheste/dev_env ~/Repos/amcheste/dev_env
+            cd ~/Repos/amcheste/dev_env && bash setup.sh
+            ```
+
+            ## Upgrading an existing installation
+
+            ```bash
+            cd ~/Repos/amcheste/dev_env
+            bash scripts/upgrade.sh
+            ```
+
+            See [README](https://github.com/amcheste/dev_env#upgrading) for full details.

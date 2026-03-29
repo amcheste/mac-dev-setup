@@ -1,0 +1,33 @@
+# Brewfile.ci — CLI-tools-only subset used in CI/CD.
+# Skips GUI casks (GoLand, IntelliJ, Docker, etc.) to keep pipeline fast.
+# The full Brewfile is used for real machine setup.
+
+# ── CLI Utilities ────────────────────────────────────────────────────────────
+brew "git"
+brew "gh"
+brew "vim"
+brew "fzf"
+brew "ripgrep"
+brew "fd"
+brew "bat"
+brew "tmux"
+brew "wget"
+brew "jq"
+brew "tree"
+
+# ── Languages ────────────────────────────────────────────────────────────────
+brew "go"
+brew "pyenv"
+brew "nvm"
+brew "openjdk"
+brew "maven"
+
+# ── Cloud & DevOps ───────────────────────────────────────────────────────────
+brew "kubernetes-cli"
+brew "kind"
+brew "helm"
+brew "terraform"
+brew "doctl"
+
+# ── Databases ────────────────────────────────────────────────────────────────
+brew "mongosh"
