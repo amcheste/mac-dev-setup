@@ -78,6 +78,16 @@ else
     echo "  ~/.secrets already configured ✓"
 fi
 
+# ── Claude Code MCPs ─────────────────────────────────────────────────────────
+echo ""
+echo "▶ Configuring Claude Code MCP servers..."
+if command -v claude &>/dev/null; then
+    bash "$REPO_DIR/scripts/setup-mcps.sh"
+else
+    echo "  Claude Code not found — skipping MCP setup"
+    echo "  Install Claude Code then run: bash scripts/setup-mcps.sh"
+fi
+
 # ── Done ─────────────────────────────────────────────────────────────────────
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
@@ -86,9 +96,9 @@ echo "━━━━━━━━━━━━━━━━━━━━━━━━�
 echo ""
 echo "  Restart your terminal, or run:  source ~/.zshrc"
 echo ""
-echo "  Optional next steps:"
-echo "    brew install --HEAD amcheste/mac-dev-setup/dev-tools"
-echo "    (installs the formula version with caveats and test support)"
+echo "  Claude Code is configured with:"
+echo "    • CLAUDE.md  — your dev preferences and learned config"
+echo "    • MCP servers — GitHub, filesystem, memory, PostgreSQL"
 echo ""
 
 exit $SUCCESS

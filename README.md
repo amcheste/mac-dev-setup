@@ -2,9 +2,10 @@
 
 # mac-dev-setup
 
-**A fully automated macOS developer environment — from zero to productive in one command.**
+**An agentic-forward macOS developer environment — from zero to productive in one command.**
 
 [![Validate](https://github.com/amcheste/mac-dev-setup/actions/workflows/validate.yml/badge.svg)](https://github.com/amcheste/mac-dev-setup/actions/workflows/validate.yml)
+[![Version](https://img.shields.io/github/v/tag/amcheste/mac-dev-setup?label=version&sort=semver)](https://github.com/amcheste/mac-dev-setup/releases)
 [![macOS](https://img.shields.io/badge/macOS-Sequoia%2B-000000?logo=apple&logoColor=white)](https://www.apple.com/macos/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
@@ -13,8 +14,7 @@
 ---
 
 Setting up a new Mac — or recovering from a disaster — should take minutes, not days.
-This repo automates everything: Homebrew packages, GUI apps, dotfiles, Vim plugins, and credentials.
-It's versioned, tested against a real macOS runner on every pull request, and designed to be run again and again without side effects.
+This repo automates everything: Homebrew packages, GUI apps, dotfiles, Vim plugins, credentials, and a fully configured [Claude Code](https://claude.ai/claude-code) environment with MCP servers wired in from day one.
 
 ```bash
 git clone https://github.com/amcheste/mac-dev-setup ~/Repos/amcheste/mac-dev-setup
@@ -22,6 +22,41 @@ bash ~/Repos/amcheste/mac-dev-setup/setup.sh
 ```
 
 > Installs Homebrew if missing, then handles everything else unattended.
+
+---
+
+## Agentic Development — Built In
+
+This isn't just a tool installer. It sets up **Claude Code** as a first-class part of the development workflow — configured to know how you work, what you build, and how you prefer to do it.
+
+### Claude Code Configuration
+
+A `CLAUDE.md` file in this repo captures your development preferences so Claude Code understands your environment from the first session on any machine:
+
+- **Tooling** — Vim, Zsh, Go/Python/Java/Node, OCI + DigitalOcean, Kubernetes via `kind`
+- **Git workflow** — always branch, always PR, conventional commits, descriptive messages
+- **Shell standards** — `shellcheck`-clean scripts, `set -euo pipefail`, idempotent installs
+- **Project conventions** — how to test with `act`, when to update `Brewfile.ci`, how to add tools
+
+### Learned Preferences — A Model That Grows With You
+
+The `CLAUDE.md` has a **Learned Preferences** section that acts as a living record of how you work.
+As Claude Code works with you across sessions and notices consistent patterns — how you structure commits, which shortcuts you reach for, what output format you prefer — those observations get added back here and committed. Not session-specific questions, but durable preferences that should be true on every clean install.
+
+Over time, this file becomes a precise picture of your development style. New machine, new team member, new context — Claude Code picks it all up instantly.
+
+### MCP Servers — Claude Wired Into Your Stack
+
+`setup.sh` automatically configures [MCP servers](https://modelcontextprotocol.io) so Claude Code has direct access to your development infrastructure:
+
+| MCP | What Claude Can Do |
+|-----|--------------------|
+| **GitHub** | Read/write PRs, issues, Actions runs, code search, releases |
+| **Filesystem** | Navigate `~/Repos`, `~/Documents`, `~/.claude` beyond the active project |
+| **Memory** | Persist facts across sessions — supplements `CLAUDE.md` with dynamic context |
+| **PostgreSQL** | Query local and dev databases directly in conversation |
+
+To reconfigure MCPs: `bash scripts/setup-mcps.sh`
 
 ---
 
@@ -152,9 +187,19 @@ bash ~/Repos/amcheste/mac-dev-setup/scripts/upgrade.sh
 
 ---
 
-## CI/CD
+## CI/CD Pipeline
 
-Every pull request runs a three-job pipeline on a **real macOS GitHub Actions runner**:
+Five automated workflows keep the environment reliable across every change and release.
+
+| Workflow | Trigger | Purpose |
+|----------|---------|---------|
+| **Validate** | Every PR + push to `main` | Lint, formula audit, macOS integration test |
+| **VM Acceptance** | Release tags + manual | Full install in a clean Tart VM — the release gate |
+| **Release** | `v*.*.*` tags | Validate → acceptance → draft notes → publish release |
+| **Dependency Update** | Weekly (Monday) | Checks Brewfile packages for updates, opens issue if stale |
+| **Stale** | Daily | Closes inactive issues and PRs after 30 + 7 days |
+
+### Validate pipeline (every PR)
 
 ```
 ┌─────────────────┐     ┌──────────────────┐
@@ -179,7 +224,13 @@ Every pull request runs a three-job pipeline on a **real macOS GitHub Actions ru
          └──────────────────────┘
 ```
 
-Releases are cut with a `v*.*.*` tag — the release pipeline runs validation as a gate, then publishes a GitHub Release automatically.
+### Release gate
+
+Before any release is published, a clean macOS VM is spun up via [Tart](https://github.com/cirruslabs/tart), `setup.sh` runs from scratch, and the full acceptance test suite must pass. The release is blocked if anything fails.
+
+```
+tag push → validate → VM acceptance → draft release notes → publish release
+```
 
 ---
 
@@ -210,6 +261,35 @@ mac-dev-setup/
 
 ---
 
+## Versioning
+
+This project follows [Semantic Versioning](https://semver.org/).
+
+```bash
+# Bump and tag a new release
+./scripts/bump-version.sh patch   # 1.0.0 → 1.0.1
+./scripts/bump-version.sh minor   # 1.0.0 → 1.1.0
+./scripts/bump-version.sh major   # 1.0.0 → 2.0.0
+```
+
+The script updates `VERSION`, promotes `[Unreleased]` in `CHANGELOG.md`, commits, and creates an annotated tag. Push with `git push && git push --tags` to trigger the release pipeline.
+
+---
+
+## Testing
+
+CI runs on every pull request against a real macOS runner. For full acceptance testing — including GUI casks and the interactive setup flow — see **[TESTING.md](TESTING.md)** for five options ranging from a local macOS user account to a UTM virtual machine.
+
+| Method | Covers Casks | Clean State | Effort |
+|--------|-------------|-------------|--------|
+| CI/CD (automatic) | ✗ | ✓ | None |
+| `act` (local) | ✗ | ✗ | Low |
+| New macOS user | ✓ | ✓ | Low |
+| Manual Actions run | ✓ | ✓ | Medium |
+| UTM VM | ✓ | ✓ (snapshots) | High |
+
+---
+
 ## iTerm2 Color Profile
 
 Import `etc/Default.json` for the matching terminal color scheme:
@@ -220,6 +300,18 @@ Pairs with **Meslo LG Nerd Font** (installed automatically by the Brewfile).
 
 ---
 
+## Contributing
+
+This is Alan Chester's personal development environment. It is open for others to **fork and adapt** for their own use — that is the primary use case for anyone other than the owner.
+
+Bug fixes and improvements that are genuinely broadly useful are welcome as pull requests. Preference-based changes will generally be declined — if the defaults don't fit your workflow, fork it and make it yours.
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the full contribution guide, development workflow, and release process.
+
+---
+
 ## License
 
-MIT — do whatever you want with it.
+Released under the [MIT License](LICENSE).
+
+You are free to use, fork, modify, and distribute this project for any purpose. No warranty is provided — this is a personal environment, not a supported product.

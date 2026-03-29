@@ -23,6 +23,9 @@ jobs:
           shellcheck scripts/install-dotfiles.sh
           shellcheck scripts/setup-credentials.sh
           shellcheck scripts/upgrade.sh
+          shellcheck scripts/bump-version.sh
+          shellcheck scripts/acceptance-test.sh
+          shellcheck scripts/vm-acceptance-test.sh
 
       - name: Verify secrets.template contains no real credentials
         run: |
