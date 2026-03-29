@@ -92,6 +92,17 @@ done
 echo "▶ Cloning repository into VM"
 vm_ssh "git clone https://github.com/amcheste/mac-dev-setup ~/Repos/amcheste/mac-dev-setup"
 
+echo "▶ Pre-seeding ~/.secrets with placeholder values (skips interactive credential wizard)"
+vm_ssh 'printf "%s\n" \
+  "# Placeholder secrets for VM acceptance test — not real credentials." \
+  "export ANTHROPIC_API_KEY=\"vm-test-placeholder\"" \
+  "export OCIR_TOKEN=\"vm-test-placeholder\"" \
+  "export OCIR_REGION=\"vm-test-placeholder\"" \
+  "export OCIR_NAMESPACE=\"vm-test-placeholder\"" \
+  "export DIGITAL_OCEAN_TOKEN=\"vm-test-placeholder\"" \
+  "export DB_PASSWORD=\"vm-test-placeholder\"" \
+  > ~/.secrets && chmod 600 ~/.secrets'
+
 echo "▶ Running setup.sh (using Brewfile.vm — excludes large IDEs)"
 vm_ssh "cd ~/Repos/amcheste/mac-dev-setup && BREWFILE=Brewfile.vm bash setup.sh"
 
