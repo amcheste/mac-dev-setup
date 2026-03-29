@@ -11,10 +11,14 @@ jobs:
     name: Validate Before Release
     uses: ./.github/workflows/validate.yml
 
-  # ── Gate: VM acceptance test ───────────────────────────────────────────────
+  # ── Gate: VM acceptance test (stable releases only) ──────────────────────
+  # Pre-release tags (e.g. -beta.1, -rc.1) skip this gate — they are
+  # explicitly not fully vetted. Stable tags (1.0.0+) require a clean VM
+  # install before publishing. A skipped job counts as success for `needs`.
   acceptance:
     name: VM Acceptance
     needs: validate
+    if: ${{ !contains(github.ref_name, '-') }}
     uses: ./.github/workflows/acceptance.yml
 
   # ── Create GitHub Release ─────────────────────────────────────────────────
