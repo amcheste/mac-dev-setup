@@ -10,6 +10,7 @@
 
 - [ ] `shellcheck` passes on all modified scripts
 - [ ] `Brewfile.ci` updated alongside `Brewfile` (if adding CLI tools)
-- [ ] `CHANGELOG.md` updated under `[Unreleased]`
-- [ ] Tested locally — method: <!-- act / new macOS user / UTM / VM acceptance test -->
+- [ ] Tested locally — method: <!-- act / new macOS user / VM acceptance test -->
 - [ ] README updated if adding/removing tools or changing install steps
+
+<!-- Release notes are auto-drafted from this PR's title and labels — no CHANGELOG edit needed. -->
