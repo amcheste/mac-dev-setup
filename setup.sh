@@ -50,7 +50,10 @@ brew tap amcheste/mac-dev-setup https://github.com/amcheste/mac-dev-setup 2>/dev
 # ── Brew Bundle ──────────────────────────────────────────────────────────────
 echo ""
 echo "▶ Installing packages (this may take a few minutes)..."
-brew bundle --file="$REPO_DIR/Brewfile" \
+# BREWFILE env var allows alternate package lists (e.g. Brewfile.vm for VM tests)
+BREWFILE_PATH="${BREWFILE:-$REPO_DIR/Brewfile}"
+echo "  Using: $BREWFILE_PATH"
+brew bundle --file="$BREWFILE_PATH" \
     || { echo "ERROR: brew bundle failed"; exit $FAILED; }
 
 # ── Dotfiles ─────────────────────────────────────────────────────────────────

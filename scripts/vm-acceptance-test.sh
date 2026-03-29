@@ -92,8 +92,8 @@ done
 echo "▶ Cloning repository into VM"
 vm_ssh "git clone https://github.com/amcheste/mac-dev-setup ~/Repos/amcheste/mac-dev-setup"
 
-echo "▶ Running setup.sh"
-vm_ssh "cd ~/Repos/amcheste/mac-dev-setup && bash setup.sh"
+echo "▶ Running setup.sh (using Brewfile.vm — excludes large IDEs)"
+vm_ssh "cd ~/Repos/amcheste/mac-dev-setup && BREWFILE=Brewfile.vm bash setup.sh"
 
 echo "▶ Copying acceptance-test.sh to VM"
 vm_scp "$SCRIPT_DIR/acceptance-test.sh" "/tmp/acceptance-test.sh"
