@@ -25,7 +25,7 @@ brew update
 
 echo ""
 echo "▶ Installing any new packages from Brewfile..."
-brew bundle --file="$REPO_DIR/Brewfile" --no-lock
+brew bundle --file="$REPO_DIR/Brewfile"
 
 echo ""
 echo "▶ Upgrading installed packages..."

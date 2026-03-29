@@ -50,7 +50,7 @@ brew tap amcheste/dev-env https://github.com/amcheste/dev_env 2>/dev/null || tru
 # ── Brew Bundle ──────────────────────────────────────────────────────────────
 echo ""
 echo "▶ Installing packages (this may take a few minutes)..."
-brew bundle --file="$REPO_DIR/Brewfile" --no-lock \
+brew bundle --file="$REPO_DIR/Brewfile" \
     || { echo "ERROR: brew bundle failed"; exit $FAILED; }
 
 # ── Dotfiles ─────────────────────────────────────────────────────────────────

@@ -66,7 +66,7 @@ jobs:
       - name: Install CLI tools from Brewfile.ci
         run: |
           brew update
-          brew bundle --file=Brewfile.ci --no-lock --no-upgrade
+          brew bundle --file=Brewfile.ci --no-upgrade
         timeout-minutes: 30
 
       - name: Run install-dotfiles.sh
