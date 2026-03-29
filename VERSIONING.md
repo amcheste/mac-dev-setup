@@ -59,14 +59,25 @@ git push && git push --tags
 
 ## Release Pipeline
 
-Pushing a `v*.*.*` tag automatically triggers:
+Pushing a `v*.*.*` tag automatically triggers the release pipeline. The gates differ
+by version type:
 
+**Pre-release tags** (e.g. `v0.1.0-beta.1`, `v1.0.0-rc.1`):
 ```
-tag push → validate → VM acceptance test → publish GitHub Release
+tag push → validate (lint + formula audit + integration test) → publish Pre-release
 ```
 
-The release is **blocked** if either gate fails. A pre-release tag (containing `-`)
-publishes with the GitHub Pre-release flag and does not become the default install version.
+**Stable tags** (e.g. `v1.0.0`, `v1.2.3`):
+```
+tag push → validate → VM acceptance test (clean macOS VM) → publish Release
+```
+
+Pre-release versions skip the VM acceptance gate by design — they are explicitly
+not fully vetted. The validate pipeline (shellcheck, formula audit, real macOS
+integration test) still runs and must pass for all release types.
+
+Stable releases require a full clean-room VM install to pass before publishing.
+This is the guarantee that `1.0.0`+ versions work on a real machine from scratch.
 
 ---
 
