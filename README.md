@@ -302,10 +302,16 @@ Pairs with **Meslo LG Nerd Font** (installed automatically by the Brewfile).
 
 ## Contributing
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for development setup, commit conventions, and the release process.
+This is Alan Chester's personal development environment. It is open for others to **fork and adapt** for their own use — that is the primary use case for anyone other than the owner.
+
+Bug fixes and improvements that are genuinely broadly useful are welcome as pull requests. Preference-based changes will generally be declined — if the defaults don't fit your workflow, fork it and make it yours.
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the full contribution guide, development workflow, and release process.
 
 ---
 
 ## License
 
-MIT — do whatever you want with it.
+Released under the [MIT License](LICENSE).
+
+You are free to use, fork, modify, and distribute this project for any purpose. No warranty is provided — this is a personal environment, not a supported product.
