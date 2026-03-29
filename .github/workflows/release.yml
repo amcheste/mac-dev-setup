@@ -40,7 +40,7 @@ jobs:
           echo "Tag matches VERSION file: $TAG ✓"
 
       - name: Draft release notes
-        uses: release-drafter/release-drafter@v6
+        uses: release-drafter/release-drafter@v7
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
