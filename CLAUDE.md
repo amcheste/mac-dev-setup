@@ -46,7 +46,10 @@ tools, dotfiles, credentials, MCPs, and Claude Code configuration all included.
 - **Terraform** for infrastructure as code
 
 ### Git & GitHub Workflow
-- Always branch from `main`, never commit directly
+- **Branch model:** `main` = latest release (always stable). `develop` = integration branch.
+- Always branch from `develop`, never commit directly to `main` or `develop`
+- PRs always target `develop`
+- `main` is only updated via the develop→main release PR opened by `/publish-release`
 - Always open a PR for review before merging
 - Commit messages should be descriptive — explain *why*, not just *what*
 - Conventional commits style: `feat:`, `fix:`, `docs:`, `chore:`

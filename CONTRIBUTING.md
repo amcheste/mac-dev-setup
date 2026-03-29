@@ -34,9 +34,21 @@ If you've found something that is broken or outdated in a way that affects every
 Fork and clone to the standard path:
 ```bash
 git clone git@github.com:<YOUR_FORK>/mac-dev-setup ~/Repos/<YOUR_GITHUB_USERNAME>/mac-dev-setup
+cd ~/Repos/<YOUR_GITHUB_USERNAME>/mac-dev-setup
+git checkout develop
 ```
 
 ---
+
+## Branch Model
+
+| Branch | Purpose |
+|--------|---------|
+| `main` | Always equals the latest published release — stable, never directly committed to |
+| `develop` | Integration branch — all PRs target here |
+| `feature/*`, `fix/*`, etc. | Short-lived branches off `develop` |
+
+PRs go to `develop`. When enough changes accumulate for a release, `develop` is promoted to `main` via the `/publish-release` skill, which opens the develop→main PR automatically.
 
 ## Development Workflow
 
@@ -100,13 +112,19 @@ release gate.
 
 > Only the repo owner publishes releases.
 
-1. Update `CHANGELOG.md` — move items from `[Unreleased]` into the new version section if needed.
-2. Run the bump script:
-   ```bash
-   ./scripts/bump-version.sh patch   # or minor / major
-   ```
-3. Push the commit and tag:
-   ```bash
-   git push && git push --tags
-   ```
-4. The release pipeline runs automatically: validate → VM acceptance → draft release notes → publish.
+Releases are handled by the `/publish-release` Claude Code skill, which automates the full flow:
+
+1. Bumps version on `develop`, commits `chore: release v<version>`
+2. Opens a PR: `develop → main`
+3. Owner approves and merges the PR
+4. Tags `main` with `v<version>` and pushes the tag
+5. Release pipeline fires automatically: validate → VM acceptance → publish
+
+To trigger manually:
+```bash
+# In Claude Code
+/publish-release 1.0.0
+
+# Or via bump script directly (then follow the steps above)
+./scripts/bump-version.sh patch   # or minor / major / set <version>
+```
