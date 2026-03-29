@@ -263,16 +263,20 @@ mac-dev-setup/
 
 ## Versioning
 
-This project follows [Semantic Versioning](https://semver.org/).
+This project follows [Semantic Versioning](https://semver.org/). Versions under `0.x.x` are pre-stable; `1.0.0`+ signals a proven, mainstream-ready release. Pre-release tags (e.g. `-beta.1`, `-rc.1`) are published to GitHub with the Pre-release flag and do not show as the latest version.
 
 ```bash
-# Bump and tag a new release
-./scripts/bump-version.sh patch   # 1.0.0 → 1.0.1
-./scripts/bump-version.sh minor   # 1.0.0 → 1.1.0
-./scripts/bump-version.sh major   # 1.0.0 → 2.0.0
+# Stable increments
+./scripts/bump-version.sh patch              # 1.0.0 → 1.0.1
+./scripts/bump-version.sh minor              # 1.0.0 → 1.1.0
+./scripts/bump-version.sh major              # 1.0.0 → 2.0.0
+
+# Explicit version (including pre-release)
+./scripts/bump-version.sh set 0.1.0-beta.1
+./scripts/bump-version.sh set 1.0.0-rc.1
 ```
 
-The script updates `VERSION`, promotes `[Unreleased]` in `CHANGELOG.md`, commits, and creates an annotated tag. Push with `git push && git push --tags` to trigger the release pipeline.
+Push with `git push && git push --tags` to trigger the release pipeline. See **[VERSIONING.md](VERSIONING.md)** for the full scheme.
 
 ---
 

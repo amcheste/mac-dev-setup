@@ -63,6 +63,28 @@ if [[ ! -f "$VIM_PLUG" ]]; then
     echo "  vim-plug installed ✓"
 fi
 
+# ── Claude Code skills ────────────────────────────────────────────────────────
+SKILLS_SRC_DIR="$REPO_DIR/claude-skills"
+SKILLS_DEST_DIR="$HOME/.claude/skills"
+
+if [[ -d "$SKILLS_SRC_DIR" ]]; then
+    echo ""
+    mkdir -p "$SKILLS_DEST_DIR"
+    for skill_dir in "$SKILLS_SRC_DIR"/*/; do
+        skill_name="$(basename "$skill_dir")"
+        dest="$SKILLS_DEST_DIR/$skill_name"
+        if [[ -L "$dest" ]]; then
+            rm "$dest"
+        elif [[ -d "$dest" ]]; then
+            mv "$dest" "${dest}.bak"
+            echo "  Backing up   $dest  →  ${dest}.bak"
+        fi
+        ln -sf "$skill_dir" "$dest"
+        echo "  Linked       $dest  →  $skill_dir"
+    done
+    echo "  Claude Code skills installed ✓  (invoke with /publish-release)"
+fi
+
 echo ""
 echo "Done! Next steps:"
 echo "  1. vim +PlugInstall +qall     — install Vim plugins"
