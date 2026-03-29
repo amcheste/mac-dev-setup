@@ -37,9 +37,6 @@ cask "font-meslo-lg-nerd-font"
 
 # ── GUI Apps ─────────────────────────────────────────────────────────────────
 cask "iterm2"
-cask "cursor"
+cask "cursor"           # AI-first editor (works alongside Claude Code)
 cask "docker"
-cask "goland"
-cask "intellij-idea"
-cask "pycharm"
 cask "mongodb-compass"

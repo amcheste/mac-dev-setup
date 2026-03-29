@@ -1,10 +1,6 @@
 # Brewfile.vm — used by the VM acceptance test (scripts/vm-acceptance-test.sh)
-# Full environment minus the large JetBrains IDEs and Cursor, which exceed the
-# 50GB Tart base image disk limit. Everything else — CLI tools, Docker, iTerm2,
-# MongoDB Compass, fonts — is included and tested.
-#
-# IDEs omitted: cursor, goland, intellij-idea, pycharm
-# These are covered by the full Brewfile on a real machine.
+# Mirrors the full Brewfile exactly. JetBrains IDEs were removed from the main
+# Brewfile so this file no longer needs to omit anything for disk budget reasons.
 
 # ── Taps ─────────────────────────────────────────────────────────────────────
 tap "homebrew/cask-fonts"
@@ -45,5 +41,6 @@ cask "font-meslo-lg-nerd-font"
 
 # ── GUI Apps ─────────────────────────────────────────────────────────────────
 cask "iterm2"
+cask "cursor"           # AI-first editor (works alongside Claude Code)
 cask "docker"
 cask "mongodb-compass"

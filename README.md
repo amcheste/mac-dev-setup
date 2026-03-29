@@ -101,7 +101,6 @@ To reconfigure MCPs: `bash scripts/setup-mcps.sh`
 | **iTerm2** | Terminal (with custom color profile) |
 | **Cursor** | AI-powered editor |
 | **Docker Desktop** | Container runtime |
-| **GoLand / IntelliJ / PyCharm** | JetBrains IDEs |
 | **MongoDB Compass** | Database GUI |
 | **Meslo LG Nerd Font** | Powerline-compatible font for terminal |
 
