@@ -8,6 +8,7 @@
 [![Version](https://img.shields.io/github/v/tag/amcheste/mac-dev-setup?label=version&sort=semver)](https://github.com/amcheste/mac-dev-setup/releases)
 [![macOS](https://img.shields.io/badge/macOS-Sequoia%2B-000000?logo=apple&logoColor=white)](https://www.apple.com/macos/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/amcheste/mac-dev-setup/badge)](https://scorecard.dev/viewer/?uri=github.com/amcheste/mac-dev-setup)
 
 </div>
 
@@ -192,11 +193,14 @@ Five automated workflows keep the environment reliable across every change and r
 
 | Workflow | Trigger | Purpose |
 |----------|---------|---------|
-| **Validate** | Every PR + push to `main` | Lint, formula audit, macOS integration test |
+| **Validate** | Every PR + push to `main` | Lint, shellcheck, formula audit, macOS integration test, commit lint + semver suggestion |
 | **VM Acceptance** | Release tags + manual | Full install in a clean Tart VM — the release gate |
-| **Release** | `v*.*.*` tags | Validate → acceptance → draft notes → publish release |
+| **Release** | `v*.*.*` tags | Validate → acceptance → publish release |
+| **Release Drafter** | PR open/update + push to `main` | Auto-labels PRs by type, drafts release notes |
+| **Label PR** | PR open/update | Adds content labels (`brew`, `scripts`, `dotfiles`, `ci`) |
 | **Dependency Update** | Weekly (Monday) | Checks Brewfile packages for updates, opens issue if stale |
 | **Stale** | Daily | Closes inactive issues and PRs after 30 + 7 days |
+| **OpenSSF Scorecard** | Weekly + push to `main` | Security posture scoring and SARIF upload |
 
 ### Validate pipeline (every PR)
 

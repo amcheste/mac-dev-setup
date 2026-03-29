@@ -1,0 +1,23 @@
+brew:
+  - changed-files:
+    - any-glob-to-any-file: ['Brewfile', 'Brewfile.*']
+
+scripts:
+  - changed-files:
+    - any-glob-to-any-file: ['scripts/**']
+
+dotfiles:
+  - changed-files:
+    - any-glob-to-any-file: ['dotfiles/**']
+
+ci:
+  - changed-files:
+    - any-glob-to-any-file: ['.github/**']
+
+formula:
+  - changed-files:
+    - any-glob-to-any-file: ['Formula/**']
+
+docs:
+  - changed-files:
+    - any-glob-to-any-file: ['*.md', 'CLAUDE.md', 'TESTING.md', 'VERSIONING.md']
