@@ -26,6 +26,9 @@ jobs:
     name: Create Release
     runs-on: ubuntu-latest
     needs: [validate, acceptance]
+    # Run if validate succeeded AND acceptance either succeeded or was skipped
+    # (acceptance is skipped for pre-release tags by design)
+    if: ${{ always() && needs.validate.result == 'success' && (needs.acceptance.result == 'success' || needs.acceptance.result == 'skipped') }}
     permissions:
       contents: write
     steps:
