@@ -12,7 +12,7 @@ jobs:
     name: Lint
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Install shellcheck
         run: sudo apt-get install -y shellcheck
@@ -48,7 +48,7 @@ jobs:
     name: Formula Audit
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Audit formula style and correctness
         run: |
@@ -64,7 +64,7 @@ jobs:
     runs-on: macos-latest
     needs: [lint, formula-audit]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Install CLI tools from Brewfile.ci
         run: |
