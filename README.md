@@ -1,5 +1,7 @@
 # dev_env
 
+[![Validate](https://github.com/amcheste/dev_env/actions/workflows/validate.yml/badge.svg)](https://github.com/amcheste/dev_env/actions/workflows/validate.yml)
+
 Personal developer environment for macOS — managed as a Homebrew tap.
 
 One command installs all CLI tools, GUI apps, dotfiles, and prompts for credentials.
@@ -122,14 +124,32 @@ The wizard configures:
 
 ---
 
-## Updating
+## Upgrading
+
+Run the upgrade script to pull the latest changes, update all packages, and refresh dotfiles:
 
 ```bash
 cd ~/Repos/amcheste/dev_env
-git pull
-brew bundle --file=Brewfile --no-lock   # install any new packages
-bash scripts/install-dotfiles.sh        # re-link dotfiles if changed
+bash scripts/upgrade.sh
 ```
+
+This does: `git pull` → `brew bundle` (new packages) → `brew upgrade` (existing packages) → re-link dotfiles → `vim +PlugUpdate`.
+
+---
+
+## CI/CD
+
+Every pull request and push to `main` runs the validation pipeline:
+
+| Check | What it does |
+|-------|-------------|
+| **Shell lint** | `shellcheck` on all `.sh` scripts |
+| **Formula audit** | `brew audit --strict` + `brew style` on the formula |
+| **Secret safety** | Scans `secrets.template` for real credential patterns |
+| **Integration test** | Real macOS runner — installs from `Brewfile.ci`, runs `install-dotfiles.sh`, asserts symlinks + permissions |
+| **Tool smoke test** | Verifies `go`, `kubectl`, `helm`, `terraform`, `doctl`, `jq`, `gh` are on PATH |
+
+Releases are cut by pushing a `v*.*.*` tag — the release pipeline runs full validation as a gate before creating the GitHub Release.
 
 ---
 
