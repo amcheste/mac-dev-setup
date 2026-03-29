@@ -1,39 +1,33 @@
 class DevTools < Formula
   desc "Personal developer environment — dotfiles and setup scripts"
   homepage "https://github.com/amcheste/dev_env"
-  head "https://github.com/amcheste/dev_env.git", branch: "main"
   license "MIT"
+  head "https://github.com/amcheste/dev_env.git", branch: "main"
 
-  # ── CLI Utilities ────────────────────────────────────────────────────────
-  depends_on "git"
-  depends_on "gh"
-  depends_on "vim"
-  depends_on "fzf"
-  depends_on "ripgrep"
-  depends_on "fd"
+  # Dependencies — must be alphabetical (enforced by brew style)
   depends_on "bat"
-  depends_on "tmux"
-  depends_on "jq"
-  depends_on "tree"
-  depends_on "wget"
-
-  # ── Languages ───────────────────────────────────────────────────────────
-  depends_on "go"
-  depends_on "pyenv"
-  depends_on "nvm"
-  depends_on "openjdk"
-  depends_on "maven"
-
-  # ── Cloud & DevOps ──────────────────────────────────────────────────────
-  depends_on "kubernetes-cli"
-  depends_on "kind"
-  depends_on "helm"
-  depends_on "terraform"
-  depends_on "oci-cli"
   depends_on "doctl"
-
-  # ── Databases ───────────────────────────────────────────────────────────
+  depends_on "fd"
+  depends_on "fzf"
+  depends_on "gh"
+  depends_on "git"
+  depends_on "go"
+  depends_on "helm"
+  depends_on "jq"
+  depends_on "kind"
+  depends_on "kubernetes-cli"
+  depends_on "maven"
   depends_on "mongosh"
+  depends_on "nvm"
+  depends_on "oci-cli"
+  depends_on "openjdk"
+  depends_on "pyenv"
+  depends_on "ripgrep"
+  depends_on "terraform"
+  depends_on "tmux"
+  depends_on "tree"
+  depends_on "vim"
+  depends_on "wget"
 
   def install
     # Install dotfiles to share dir so install-dotfiles.sh can find them
@@ -63,8 +57,8 @@ class DevTools < Formula
   end
 
   test do
-    assert_predicate pkgshare/"dotfiles/vimrc", :exist?
-    assert_predicate pkgshare/"dotfiles/zshrc", :exist?
-    assert_predicate pkgshare/"dotfiles/secrets.template", :exist?
+    assert_path_exists pkgshare/"dotfiles/vimrc"
+    assert_path_exists pkgshare/"dotfiles/zshrc"
+    assert_path_exists pkgshare/"dotfiles/secrets.template"
   end
 end

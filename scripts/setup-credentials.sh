@@ -5,8 +5,6 @@
 set -euo pipefail
 
 SECRETS_FILE="$HOME/.secrets"
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-TEMPLATE="$(dirname "$SCRIPT_DIR")/dotfiles/secrets.template"
 
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "  Credential Setup Wizard"
