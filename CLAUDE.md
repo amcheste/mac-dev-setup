@@ -93,6 +93,22 @@ When adding a new tool to the environment:
 3. Add to the smoke-test in `.github/workflows/validate.yml`
 4. Update `README.md` tool table
 
+### Publishing a Release
+
+Use the `/publish-release` skill (installed automatically by `install-dotfiles.sh`):
+
+> "Lets publish v1.0.0 mac-dev-setup"
+> "Publish v0.2.0-beta.1"
+
+Or run manually:
+```bash
+./scripts/bump-version.sh set 0.1.0-beta.1   # pre-release
+./scripts/bump-version.sh patch               # stable increment
+git push && git push --tags                   # triggers release pipeline
+```
+
+See `VERSIONING.md` for the full versioning scheme.
+
 ---
 
 ## Learned Preferences

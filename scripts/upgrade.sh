@@ -47,6 +47,18 @@ else
     echo "  vim-plug not found — skipping"
 fi
 
+# ── Sync MCP servers ─────────────────────────────────────────────────────────
+# setup-mcps.sh is idempotent — skips servers already configured, adds any new
+# ones added to the repo since the last upgrade.
+echo ""
+echo "▶ Syncing MCP servers..."
+if command -v claude &>/dev/null; then
+    bash "$REPO_DIR/scripts/setup-mcps.sh"
+else
+    echo "  Claude Code not found — skipping"
+    echo "  Install Claude Code then run: bash scripts/setup-mcps.sh"
+fi
+
 # ── Done ─────────────────────────────────────────────────────────────────────
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
