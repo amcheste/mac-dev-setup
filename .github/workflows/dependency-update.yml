@@ -1,0 +1,68 @@
+name: Dependency Update
+
+on:
+  schedule:
+    - cron: '0 9 * * 1'  # Monday 09:00 UTC
+  workflow_dispatch:
+
+jobs:
+  check-brewfile:
+    name: Check Outdated Brewfile Packages
+    runs-on: macos-latest
+    permissions:
+      issues: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Update Homebrew
+        run: brew update
+
+      - name: Check for outdated packages
+        id: outdated
+        run: |
+          # Extract formula names from Brewfile (lines starting with 'brew "')
+          mapfile -t FORMULAS < <(grep '^brew ' Brewfile | sed 's/brew "\([^"]*\)".*/\1/')
+
+          STALE=()
+          for formula in "${FORMULAS[@]}"; do
+            if brew outdated --quiet | grep -q "^${formula}$"; then
+              STALE+=("$formula")
+            fi
+          done
+
+          if [[ ${#STALE[@]} -eq 0 ]]; then
+            echo "All Brewfile packages are up to date."
+            echo "stale_count=0" >> "$GITHUB_OUTPUT"
+          else
+            echo "Outdated packages: ${STALE[*]}"
+            {
+              echo "stale_count=${#STALE[@]}"
+              echo "stale_list<<EOF"
+              printf '%s\n' "${STALE[@]}"
+              echo "EOF"
+            } >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Open issue if packages are stale
+        if: steps.outdated.outputs.stale_count != '0'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Skip if an open dependencies issue already exists
+          EXISTING=$(gh issue list --label dependencies --state open --json number --jq 'length')
+          if [[ "$EXISTING" -gt 0 ]]; then
+            echo "Open dependencies issue already exists — skipping."
+            exit 0
+          fi
+
+          STALE_LIST="${{ steps.outdated.outputs.stale_list }}"
+          BODY="The following Brewfile packages have updates available as of $(date +%Y-%m-%d):"$'\n\n'
+          while IFS= read -r pkg; do
+            BODY+="- \`${pkg}\`"$'\n'
+          done <<< "$STALE_LIST"
+          BODY+=$'\n'"Run \`brew upgrade\` or \`bash scripts/upgrade.sh\` to update."
+
+          gh issue create \
+            --title "chore: Brewfile packages have updates available" \
+            --body "$BODY" \
+            --label dependencies

@@ -5,6 +5,7 @@
 **An agentic-forward macOS developer environment — from zero to productive in one command.**
 
 [![Validate](https://github.com/amcheste/mac-dev-setup/actions/workflows/validate.yml/badge.svg)](https://github.com/amcheste/mac-dev-setup/actions/workflows/validate.yml)
+[![Version](https://img.shields.io/github/v/tag/amcheste/mac-dev-setup?label=version&sort=semver)](https://github.com/amcheste/mac-dev-setup/releases)
 [![macOS](https://img.shields.io/badge/macOS-Sequoia%2B-000000?logo=apple&logoColor=white)](https://www.apple.com/macos/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
@@ -186,9 +187,19 @@ bash ~/Repos/amcheste/mac-dev-setup/scripts/upgrade.sh
 
 ---
 
-## CI/CD
+## CI/CD Pipeline
 
-Every pull request runs a three-job pipeline on a **real macOS GitHub Actions runner**:
+Five automated workflows keep the environment reliable across every change and release.
+
+| Workflow | Trigger | Purpose |
+|----------|---------|---------|
+| **Validate** | Every PR + push to `main` | Lint, formula audit, macOS integration test |
+| **VM Acceptance** | Release tags + manual | Full install in a clean Tart VM — the release gate |
+| **Release** | `v*.*.*` tags | Validate → acceptance → draft notes → publish release |
+| **Dependency Update** | Weekly (Monday) | Checks Brewfile packages for updates, opens issue if stale |
+| **Stale** | Daily | Closes inactive issues and PRs after 30 + 7 days |
+
+### Validate pipeline (every PR)
 
 ```
 ┌─────────────────┐     ┌──────────────────┐
@@ -213,7 +224,13 @@ Every pull request runs a three-job pipeline on a **real macOS GitHub Actions ru
          └──────────────────────┘
 ```
 
-Releases are cut with a `v*.*.*` tag — the release pipeline runs validation as a gate, then publishes a GitHub Release automatically.
+### Release gate
+
+Before any release is published, a clean macOS VM is spun up via [Tart](https://github.com/cirruslabs/tart), `setup.sh` runs from scratch, and the full acceptance test suite must pass. The release is blocked if anything fails.
+
+```
+tag push → validate → VM acceptance → draft release notes → publish release
+```
 
 ---
 
@@ -244,6 +261,21 @@ mac-dev-setup/
 
 ---
 
+## Versioning
+
+This project follows [Semantic Versioning](https://semver.org/).
+
+```bash
+# Bump and tag a new release
+./scripts/bump-version.sh patch   # 1.0.0 → 1.0.1
+./scripts/bump-version.sh minor   # 1.0.0 → 1.1.0
+./scripts/bump-version.sh major   # 1.0.0 → 2.0.0
+```
+
+The script updates `VERSION`, promotes `[Unreleased]` in `CHANGELOG.md`, commits, and creates an annotated tag. Push with `git push && git push --tags` to trigger the release pipeline.
+
+---
+
 ## Testing
 
 CI runs on every pull request against a real macOS runner. For full acceptance testing — including GUI casks and the interactive setup flow — see **[TESTING.md](TESTING.md)** for five options ranging from a local macOS user account to a UTM virtual machine.
@@ -265,6 +297,12 @@ Import `etc/Default.json` for the matching terminal color scheme:
 > **iTerm2** → Preferences → Profiles → Other Actions → Import JSON Profiles
 
 Pairs with **Meslo LG Nerd Font** (installed automatically by the Brewfile).
+
+---
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for development setup, commit conventions, and the release process.
 
 ---
 

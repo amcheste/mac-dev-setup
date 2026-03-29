@@ -1,0 +1,46 @@
+name: VM Acceptance Test
+
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: 'Branch or tag to test'
+        required: false
+        default: 'main'
+  push:
+    tags: ['v*.*.*']
+  workflow_call:
+
+jobs:
+  acceptance:
+    name: VM Acceptance
+    runs-on: macos-14
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cache Tart images
+        uses: actions/cache@v4
+        with:
+          path: ~/.tart
+          key: tart-sequoia-base-${{ hashFiles('scripts/vm-acceptance-test.sh') }}
+          restore-keys: tart-sequoia-base-
+
+      - name: Install Tart
+        run: |
+          brew install cirruslabs/cli/tart
+
+      - name: Install sshpass
+        run: brew install hudochenkov/sshpass/sshpass
+
+      - name: Run VM acceptance test
+        run: bash scripts/vm-acceptance-test.sh
+        timeout-minutes: 25
+
+      - name: Upload logs on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: acceptance-logs-${{ github.run_id }}
+          path: /tmp/mac-dev-setup-*.log
+          retention-days: 7
