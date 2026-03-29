@@ -70,7 +70,7 @@ jobs:
               echo "  ✗ Non-conventional: $msg"
               FAIL=1
             fi
-          done < <(git log --format='%s' "${BASE_SHA}..${HEAD_SHA}")
+          done < <(git log --no-merges --format='%s' "${BASE_SHA}..${HEAD_SHA}")
 
           if [[ $FAIL -eq 1 ]]; then
             echo ""
@@ -98,7 +98,7 @@ jobs:
               FEATURES="$FEATURES\n  - $msg"
               [[ "$BUMP" != "major" ]] && BUMP="minor"
             fi
-          done < <(git log --format='%s' "${BASE_SHA}..${HEAD_SHA}")
+          done < <(git log --no-merges --format='%s' "${BASE_SHA}..${HEAD_SHA}")
 
           {
             case $BUMP in
