@@ -2,9 +2,6 @@
 # Mirrors the full Brewfile exactly. JetBrains IDEs were removed from the main
 # Brewfile so this file no longer needs to omit anything for disk budget reasons.
 
-# ── Taps ─────────────────────────────────────────────────────────────────────
-tap "homebrew/cask-fonts"
-
 # ── CLI Utilities ────────────────────────────────────────────────────────────
 brew "git"
 brew "gh"               # GitHub CLI
