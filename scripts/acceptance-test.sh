@@ -4,6 +4,10 @@
 
 set -euo pipefail
 
+# Ensure Homebrew tools are on PATH — this script runs via non-login bash
+# so .zprofile is never sourced.
+export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:$PATH"
+
 PASS=0
 FAIL=0
 FAILURES=()
@@ -43,9 +47,8 @@ check "$HOME/.vimrc is a symlink" "test -L $HOME/.vimrc"
 
 section "Secrets"
 check "$HOME/.secrets exists" "test -f $HOME/.secrets"
-# shellcheck disable=SC2016
 check "$HOME/.secrets permissions are 0600" \
-  '[[ "$(stat -f \"%Mp%Lp\" '"$HOME"'/.secrets)" == "0600" ]]'
+  "find $HOME/.secrets -maxdepth 0 -perm 0600 | grep -q ."
 
 # ── Tools ──────────────────────────────────────────────────────────────────────
 
