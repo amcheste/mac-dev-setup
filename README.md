@@ -1,192 +1,225 @@
-# dev_env
+<div align="center">
 
-[![Validate](https://github.com/amcheste/dev_env/actions/workflows/validate.yml/badge.svg)](https://github.com/amcheste/dev_env/actions/workflows/validate.yml)
+# mac-dev-setup
 
-Personal developer environment for macOS — managed as a Homebrew tap.
+**A fully automated macOS developer environment — from zero to productive in one command.**
 
-One command installs all CLI tools, GUI apps, dotfiles, and prompts for credentials.
+[![Validate](https://github.com/amcheste/mac-dev-setup/actions/workflows/validate.yml/badge.svg)](https://github.com/amcheste/mac-dev-setup/actions/workflows/validate.yml)
+[![macOS](https://img.shields.io/badge/macOS-Sequoia%2B-000000?logo=apple&logoColor=white)](https://www.apple.com/macos/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
----
-
-## Quick Start
-
-```bash
-# 1. Clone the repo
-git clone https://github.com/amcheste/dev_env ~/Repos/amcheste/dev_env
-cd ~/Repos/amcheste/dev_env
-
-# 2. Run setup (installs Homebrew if needed, then everything else)
-bash setup.sh
-```
-
-That's it. Setup will:
-- Install [Homebrew](https://brew.sh) if not already present
-- Tap this repo (`amcheste/dev-env`)
-- Install all packages from `Brewfile` (CLI tools + GUI apps)
-- Symlink `~/.zshrc` and `~/.vimrc` from `dotfiles/`
-- Install [vim-plug](https://github.com/junegunn/vim-plug) and all Vim plugins
-- Run the credential wizard to populate `~/.secrets`
+</div>
 
 ---
 
-## Homebrew Tap
-
-Once the tap is added you can also install the formula directly:
-
-```bash
-brew tap amcheste/dev-env https://github.com/amcheste/dev_env
-brew install --HEAD amcheste/dev-env/dev-tools
-```
-
-Or install individual packages from the `Brewfile`:
+Setting up a new Mac — or recovering from a disaster — should take minutes, not days.
+This repo automates everything: Homebrew packages, GUI apps, dotfiles, Vim plugins, and credentials.
+It's versioned, tested against a real macOS runner on every pull request, and designed to be run again and again without side effects.
 
 ```bash
-brew bundle --file=~/Repos/amcheste/dev_env/Brewfile
+git clone https://github.com/amcheste/mac-dev-setup ~/Repos/amcheste/mac-dev-setup
+bash ~/Repos/amcheste/mac-dev-setup/setup.sh
 ```
+
+> Installs Homebrew if missing, then handles everything else unattended.
 
 ---
 
-## What's Installed
+## What Gets Installed
 
-### CLI Tools
+### Languages & Runtimes
+
+| Tool | Version Management |
+|------|--------------------|
+| Go | Direct via Homebrew |
+| Python | `pyenv` — switch versions per project |
+| Node.js | `nvm` — switch versions per project |
+| Java | OpenJDK + Maven |
+
+### Cloud & Infrastructure
+
 | Tool | Purpose |
 |------|---------|
-| `git`, `gh` | Version control + GitHub CLI |
-| `vim`, `fzf`, `ripgrep`, `fd`, `bat` | Editor + search utilities |
-| `tmux` | Terminal multiplexer |
-| `jq` | JSON processor |
-| `wget`, `tree` | Misc utilities |
-
-### Languages
-| Tool | Purpose |
-|------|---------|
-| `go` | Go language |
-| `pyenv` | Python version manager |
-| `nvm` | Node version manager |
-| `openjdk`, `maven` | Java + build tool |
-
-### Cloud & DevOps
-| Tool | Purpose |
-|------|---------|
-| `kubectl` | Kubernetes CLI |
-| `kind` | Local k8s clusters |
+| `kubectl` + `kind` | Kubernetes — local clusters and remote |
 | `helm` | Kubernetes package manager |
 | `terraform` | Infrastructure as code |
-| `oci-cli` | Oracle Cloud CLI |
+| `oci-cli` | Oracle Cloud Platform |
 | `doctl` | DigitalOcean CLI |
+| `gh` | GitHub CLI — PRs, releases, Actions |
 
-### Databases
-| Tool | Purpose |
-|------|---------|
+### Developer Utilities
+
+| Tool | Why It's Here |
+|------|--------------|
+| `fzf` | Fuzzy finder — wired into shell history and Vim |
+| `ripgrep` | 10x faster than grep, respects `.gitignore` |
+| `fd` | Faster `find` with sane defaults |
+| `bat` | `cat` with syntax highlighting and line numbers |
+| `tmux` | Terminal multiplexer |
+| `jq` | JSON slicing and dicing in the shell |
 | `mongosh` | MongoDB shell |
 
-### GUI Apps (Casks)
-- **iTerm2** — terminal
-- **Cursor** — AI-powered editor
-- **Docker Desktop** — containers
-- **GoLand**, **IntelliJ IDEA**, **PyCharm** — JetBrains IDEs
-- **MongoDB Compass** — database GUI
-- **Meslo LG Nerd Font** — powerline-compatible font
+### GUI Apps (via Homebrew Cask)
+
+| App | Purpose |
+|-----|---------|
+| **iTerm2** | Terminal (with custom color profile) |
+| **Cursor** | AI-powered editor |
+| **Docker Desktop** | Container runtime |
+| **GoLand / IntelliJ / PyCharm** | JetBrains IDEs |
+| **MongoDB Compass** | Database GUI |
+| **Meslo LG Nerd Font** | Powerline-compatible font for terminal |
 
 ---
 
 ## Dotfiles
 
-Dotfiles live in `dotfiles/` and are symlinked into `$HOME` by `scripts/install-dotfiles.sh`.
+Shell and editor configs live in `dotfiles/` and are **symlinked** into `$HOME` — edits in this repo take effect immediately, and `git diff` always shows what's changed.
 
-| File | Destination | Notes |
-|------|-------------|-------|
-| `dotfiles/zshrc` | `~/.zshrc` | Shell config, aliases, PATH setup |
-| `dotfiles/vimrc` | `~/.vimrc` | Full Vim config with plugins |
-| `dotfiles/secrets.template` | `~/.secrets` | Credential template (on first install) |
+```
+dotfiles/
+├── zshrc            → ~/.zshrc    (PATH, pyenv, nvm, aliases, secrets loader)
+├── vimrc            → ~/.vimrc    (vim-plug, gruvbox, ALE, vim-go, fzf)
+└── secrets.template              (copied to ~/.secrets on first run)
+```
 
-To re-install dotfiles only:
+### Vim Setup
+
+The `vimrc` turns Vim into a proper IDE without an IDE's weight:
+
+- **[vim-plug](https://github.com/junegunn/vim-plug)** — plugin manager, auto-bootstrapped
+- **[ALE](https://github.com/dense-analysis/ale)** — async lint and fix on save (`goimports`, `black`, `tflint`)
+- **[vim-go](https://github.com/fatih/vim-go)** — Go development (goimports, highlighting, `:GoBuild`)
+- **[fzf.vim](https://github.com/junegunn/fzf.vim)** — fuzzy file/buffer/grep search (`<leader>f`, `<leader>r`)
+- **[gruvbox](https://github.com/morhetz/gruvbox)** — colorscheme
+- **[NERDTree](https://github.com/preservim/nerdtree)**, **[lightline](https://github.com/itchyny/lightline.vim)**, **[vim-fugitive](https://github.com/tpope/vim-fugitive)**
+- Filetype-aware indent: real tabs for Go, 2-space for YAML/Terraform/JSON, PEP8 for Python
+
+---
+
+## Secrets Management
+
+Credentials live in `~/.secrets` — `chmod 600`, sourced by `.zshrc`, and **never committed**.
+
+On first run, `setup.sh` launches an interactive wizard that populates it:
+
+```
+── Anthropic ──────────────────────────────────
+  API Key (sk-ant-...): ████████████████████
+
+── Oracle Cloud (OCI) ─────────────────────────
+  Registry Token: ████████
+  Region (e.g. iad): iad
+  Tenancy Namespace: ████████
+
+── DigitalOcean ───────────────────────────────
+  Personal Access Token (dop_...): ████████████
+
+── Databases ──────────────────────────────────
+  Default DB Password: ████████
+```
+
+To re-run at any time: `bash scripts/setup-credentials.sh`
+
+A `dotfiles/secrets.template` (safe to commit) documents every slot.
+
+---
+
+## Homebrew Tap
+
+This repo is structured as a [Homebrew tap](https://docs.brew.sh/Taps), meaning the formula can be installed directly:
+
 ```bash
-bash scripts/install-dotfiles.sh
+brew tap amcheste/mac-dev-setup https://github.com/amcheste/mac-dev-setup
+brew install --HEAD amcheste/mac-dev-setup/dev-tools
+```
+
+Or use `brew bundle` to install just the packages without the formula:
+
+```bash
+brew bundle --file=~/Repos/amcheste/mac-dev-setup/Brewfile
 ```
 
 ---
 
-## Credentials
+## Upgrading an Existing Install
 
-Secrets live in `~/.secrets` (chmod 600, never committed).
-
-To re-run the credential wizard:
-```bash
-bash scripts/setup-credentials.sh
-```
-
-The wizard configures:
-- `ANTHROPIC_API_KEY` — for Claude Code
-- `OCIR_TOKEN`, `OCIR_REGION`, `OCIR_NAMESPACE` — Oracle Cloud Registry
-- `DIGITAL_OCEAN_TOKEN` — DigitalOcean / doctl
-- `DB_PASSWORD` — default database password
-
----
-
-## Upgrading
-
-Run the upgrade script to pull the latest changes, update all packages, and refresh dotfiles:
+One command pulls changes, updates packages, refreshes dotfile symlinks, and updates Vim plugins:
 
 ```bash
-cd ~/Repos/amcheste/dev_env
-bash scripts/upgrade.sh
+bash ~/Repos/amcheste/mac-dev-setup/scripts/upgrade.sh
 ```
-
-This does: `git pull` → `brew bundle` (new packages) → `brew upgrade` (existing packages) → re-link dotfiles → `vim +PlugUpdate`.
 
 ---
 
 ## CI/CD
 
-Every pull request and push to `main` runs the validation pipeline:
+Every pull request runs a three-job pipeline on a **real macOS GitHub Actions runner**:
 
-| Check | What it does |
-|-------|-------------|
-| **Shell lint** | `shellcheck` on all `.sh` scripts |
-| **Formula audit** | `brew audit --strict` + `brew style` on the formula |
-| **Secret safety** | Scans `secrets.template` for real credential patterns |
-| **Integration test** | Real macOS runner — installs from `Brewfile.ci`, runs `install-dotfiles.sh`, asserts symlinks + permissions |
-| **Tool smoke test** | Verifies `go`, `kubectl`, `helm`, `terraform`, `doctl`, `jq`, `gh` are on PATH |
+```
+┌─────────────────┐     ┌──────────────────┐
+│   Lint (Linux)  │     │  Formula Audit   │
+│                 │     │    (macOS)       │
+│ • shellcheck    │     │                  │
+│ • secret scan   │     │ • brew audit     │
+│ • .gitignore    │     │ • brew style     │
+└────────┬────────┘     └────────┬─────────┘
+         │                       │
+         └──────────┬────────────┘
+                    ▼
+         ┌──────────────────────┐
+         │  Integration Test    │
+         │      (macOS)         │
+         │                      │
+         │ • brew bundle        │
+         │ • install-dotfiles   │
+         │ • assert symlinks    │
+         │ • assert chmod 600   │
+         │ • smoke-test tools   │
+         └──────────────────────┘
+```
 
-Releases are cut by pushing a `v*.*.*` tag — the release pipeline runs full validation as a gate before creating the GitHub Release.
-
----
-
-## Manual Steps
-
-A few things can't be automated:
-- **OCI CLI config** — run `oci setup config` after install
-- **Vim plugins** — run `vim +PlugInstall +qall` on first open (setup.sh does this automatically)
-- **gh auth** — `gh auth login` (setup-credentials.sh handles this)
+Releases are cut with a `v*.*.*` tag — the release pipeline runs validation as a gate, then publishes a GitHub Release automatically.
 
 ---
 
 ## Repo Structure
 
 ```
-dev_env/
+mac-dev-setup/
+├── .github/
+│   └── workflows/
+│       ├── validate.yml       # CI on every PR
+│       └── release.yml        # Release on v*.*.* tags
 ├── Formula/
-│   └── dev-tools.rb          # Homebrew formula
+│   └── dev-tools.rb           # Homebrew formula
 ├── dotfiles/
-│   ├── zshrc                 # Shell config
-│   ├── vimrc                 # Vim config
-│   └── secrets.template      # Credential template
+│   ├── zshrc                  # Shell configuration
+│   ├── vimrc                  # Vim configuration
+│   └── secrets.template       # Credential slots (safe to commit)
 ├── scripts/
-│   ├── install-dotfiles.sh   # Symlinks dotfiles into $HOME
-│   └── setup-credentials.sh  # Interactive credential wizard
+│   ├── install-dotfiles.sh    # Symlinks dotfiles, bootstraps vim-plug
+│   ├── setup-credentials.sh   # Interactive credential wizard
+│   └── upgrade.sh             # Update packages + dotfiles
 ├── etc/
-│   └── Default.json          # iTerm2 color profile
-├── Brewfile                  # All packages (brew bundle)
-├── setup.sh                  # Bootstrap entry point
-└── README.md
+│   └── Default.json           # iTerm2 color profile
+├── Brewfile                   # Full package list (brew bundle)
+├── Brewfile.ci                # CLI-only subset for fast CI runs
+└── setup.sh                   # Bootstrap entry point
 ```
 
 ---
 
 ## iTerm2 Color Profile
 
-Import `etc/Default.json` in iTerm2:
-> Preferences → Profiles → Other Actions → Import JSON Profiles
+Import `etc/Default.json` for the matching terminal color scheme:
 
-Uses **Meslo LG Nerd Font** (installed by the Brewfile).
+> **iTerm2** → Preferences → Profiles → Other Actions → Import JSON Profiles
+
+Pairs with **Meslo LG Nerd Font** (installed automatically by the Brewfile).
+
+---
+
+## License
+
+MIT — do whatever you want with it.

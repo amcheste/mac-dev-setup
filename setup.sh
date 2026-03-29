@@ -4,8 +4,8 @@
 # symlinks dotfiles, and sets up credentials.
 #
 # Usage (fresh machine):
-#   git clone https://github.com/amcheste/dev_env ~/Repos/amcheste/dev_env
-#   cd ~/Repos/amcheste/dev_env && bash setup.sh
+#   git clone https://github.com/amcheste/mac-dev-setup ~/Repos/amcheste/mac-dev-setup
+#   cd ~/Repos/amcheste/mac-dev-setup && bash setup.sh
 set -euo pipefail
 
 REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -44,8 +44,8 @@ fi
 
 # ── Tap this repo ────────────────────────────────────────────────────────────
 echo ""
-echo "▶ Tapping amcheste/dev-env..."
-brew tap amcheste/dev-env https://github.com/amcheste/dev_env 2>/dev/null || true
+echo "▶ Tapping amcheste/mac-dev-setup..."
+brew tap amcheste/mac-dev-setup https://github.com/amcheste/mac-dev-setup 2>/dev/null || true
 
 # ── Brew Bundle ──────────────────────────────────────────────────────────────
 echo ""
@@ -87,7 +87,7 @@ echo ""
 echo "  Restart your terminal, or run:  source ~/.zshrc"
 echo ""
 echo "  Optional next steps:"
-echo "    brew install --HEAD amcheste/dev-env/dev-tools"
+echo "    brew install --HEAD amcheste/mac-dev-setup/dev-tools"
 echo "    (installs the formula version with caveats and test support)"
 echo ""
 

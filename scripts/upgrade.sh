@@ -3,7 +3,7 @@
 # Run this after pulling changes to apply new packages and dotfile updates.
 #
 # Usage:
-#   cd ~/Repos/amcheste/dev_env && bash scripts/upgrade.sh
+#   cd ~/Repos/amcheste/mac-dev-setup && bash scripts/upgrade.sh
 set -euo pipefail
 
 REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
