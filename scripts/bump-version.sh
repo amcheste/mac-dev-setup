@@ -19,7 +19,7 @@ COMPONENT="$1"
 [[ "$COMPONENT" =~ ^(major|minor|patch)$ ]] || usage
 
 # Read and parse current version
-CURRENT="$(cat "$VERSION_FILE" | tr -d '[:space:]')"
+CURRENT="$(tr -d '[:space:]' < "$VERSION_FILE")"
 if [[ ! "$CURRENT" =~ ^([0-9]+)\.([0-9]+)\.([0-9]+)$ ]]; then
   echo "ERROR: VERSION file contains invalid semver: '$CURRENT'" >&2
   exit 1
