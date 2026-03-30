@@ -7,13 +7,16 @@ on:
     branches: [main, develop]
   workflow_call:
 
+permissions:
+  contents: read
+
 jobs:
   # ── Job 1: Lint (fast, runs on Linux) ──────────────────────────────────────
   lint:
     name: Lint
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
 
       - name: Install shellcheck
         run: sudo apt-get install -y shellcheck
@@ -50,7 +53,7 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event_name == 'pull_request'
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
         with:
           fetch-depth: 0
 
@@ -129,7 +132,7 @@ jobs:
     name: Formula Audit
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
 
       - name: Audit formula style and correctness
         run: |
@@ -145,7 +148,7 @@ jobs:
     runs-on: macos-latest
     needs: [lint, formula-audit]
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
 
       - name: Install CLI tools from Brewfile.ci
         run: |
