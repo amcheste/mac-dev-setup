@@ -30,6 +30,7 @@ jobs:
           shellcheck scripts/bump-version.sh
           shellcheck scripts/acceptance-test.sh
           shellcheck scripts/vm-acceptance-test.sh
+          shellcheck scripts/preflight-test.sh
 
       - name: Verify secrets.template contains no real credentials
         run: |
@@ -199,3 +200,6 @@ jobs:
           command -v jq        && jq --version
           command -v gh        && gh --version
           echo "All tools verified ✓"
+
+      - name: Run preflight unit tests
+        run: bash scripts/preflight-test.sh
