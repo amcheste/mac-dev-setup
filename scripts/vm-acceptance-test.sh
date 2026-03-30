@@ -92,6 +92,9 @@ done
 echo "▶ Cloning repository into VM"
 vm_ssh "git clone https://github.com/amcheste/mac-dev-setup ~/Repos/amcheste/mac-dev-setup"
 
+echo "▶ Removing cirruslabs/cli tap (simulates fresh machine without pre-added taps)"
+vm_ssh "brew untap cirruslabs/cli 2>/dev/null || true"
+
 echo "▶ Pre-seeding ~/.secrets with placeholder values (skips interactive credential wizard)"
 vm_ssh 'printf "%s\n" \
   "# Placeholder secrets for VM acceptance test — not real credentials." \

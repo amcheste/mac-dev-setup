@@ -32,10 +32,19 @@ check() {
   fi
 }
 
+# ── Preflight ──────────────────────────────────────────────────────────────────
+
+section "Preflight"
+check "running on macOS" "test \"\$(uname)\" = Darwin"
+check "current user is in admin group" "id -Gn | tr ' ' '\n' | grep -q '^admin$'"
+check "Homebrew prefix is writable" "test -w \"\$(brew --prefix)\""
+
 # ── Homebrew ───────────────────────────────────────────────────────────────────
 
 section "Homebrew"
 check "brew is on PATH" "command -v brew"
+check "cirruslabs/cli tap is active" "brew tap | grep -q cirruslabs/cli"
+check "tart is installed" "command -v tart"
 
 # ── Dotfiles ───────────────────────────────────────────────────────────────────
 
@@ -57,6 +66,13 @@ TOOLS=(go kubectl helm terraform doctl jq gh vim fzf)
 for tool in "${TOOLS[@]}"; do
   check "$tool is on PATH" "command -v $tool"
 done
+
+# ── Claude Skills ──────────────────────────────────────────────────────────────
+
+section "Claude Skills"
+check "publish-release skill is linked" "test -L $HOME/.claude/skills/publish-release"
+check "setup-repo skill is linked"      "test -L $HOME/.claude/skills/setup-repo"
+check "create-repo skill is linked"     "test -L $HOME/.claude/skills/create-repo"
 
 # ── Shell environment ──────────────────────────────────────────────────────────
 
