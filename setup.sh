@@ -19,6 +19,52 @@ echo "  Developer Environment Setup"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo ""
 
+# ── Preflight checks ──────────────────────────────────────────────────────────
+echo "▶ Preflight checks..."
+PREFLIGHT_OK=1
+
+# macOS only
+if [[ "$(uname)" != "Darwin" ]]; then
+    echo "  ERROR: This setup script is for macOS only."
+    exit $FAILED
+fi
+
+# Must be an admin account (member of the 'admin' group)
+if ! id -Gn | tr ' ' '\n' | grep -q '^admin$'; then
+    echo ""
+    echo "  ✗ This account is not an administrator."
+    echo ""
+    echo "  Homebrew and most developer tools require admin (sudo) access."
+    echo "  Please run this script from an admin account, or ask your Mac's"
+    echo "  administrator to run it first."
+    echo ""
+    exit $FAILED
+fi
+echo "  Admin account ✓"
+
+# If Homebrew is already installed, make sure it's functional
+if command -v brew &>/dev/null; then
+    BREW_PREFIX="$(brew --prefix 2>/dev/null)" || BREW_PREFIX=""
+    if [[ -z "$BREW_PREFIX" ]]; then
+        echo "  ✗ Homebrew is installed but not functional."
+        echo "    Try: brew update  or reinstall from https://brew.sh"
+        PREFLIGHT_OK=0
+    elif [[ ! -w "$BREW_PREFIX" ]]; then
+        echo "  ✗ Homebrew prefix '$BREW_PREFIX' is not writable by this user."
+        echo "    Run:  sudo chown -R \$(whoami) $BREW_PREFIX"
+        PREFLIGHT_OK=0
+    else
+        echo "  Homebrew writable ✓"
+    fi
+fi
+
+if [[ $PREFLIGHT_OK -eq 0 ]]; then
+    echo ""
+    echo "  Please fix the issues above and re-run setup.sh."
+    exit $FAILED
+fi
+echo ""
+
 # ── Repos directory ──────────────────────────────────────────────────────────
 if [[ ! -d "$HOME/Repos" ]]; then
     echo "▶ Creating ~/Repos..."
@@ -46,6 +92,11 @@ fi
 echo ""
 echo "▶ Tapping amcheste/mac-dev-setup..."
 brew tap amcheste/mac-dev-setup https://github.com/amcheste/mac-dev-setup 2>/dev/null || true
+
+# Pre-tap third-party taps so brew bundle can resolve their formulae.
+# brew bundle processes taps and formulae together which can cause lookup
+# failures if the tap hasn't been added before the formula is fetched.
+brew tap cirruslabs/cli 2>/dev/null || true
 
 # ── Brew Bundle ──────────────────────────────────────────────────────────────
 echo ""
