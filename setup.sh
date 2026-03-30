@@ -66,7 +66,7 @@ bash "$REPO_DIR/scripts/install-dotfiles.sh" \
 echo ""
 echo "▶ Installing Vim plugins..."
 if [[ -f "$HOME/.vim/autoload/plug.vim" ]]; then
-    vim --not-a-term -c "set nomore" +PlugInstall +qall 2>/dev/null && echo "  Vim plugins installed ✓" \
+    vim --not-a-term -c "set nomore" +PlugInstall +qall >/dev/null 2>&1 && echo "  Vim plugins installed ✓" \
         || echo "  Warning: vim +PlugInstall had errors (plugins may still be installed)"
 else
     echo "  vim-plug not found — skipping (run: install-dotfiles.sh first)"
