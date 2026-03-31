@@ -146,7 +146,7 @@ jobs:
   # ── Job 3: Integration test (macOS, CLI tools only) ────────────────────────
   integration:
     name: Integration Test
-    runs-on: ${{ github.ref == 'refs/heads/main' && 'macos-15-xlarge' || 'macos-latest' }}
+    runs-on: macos-latest
     needs: [lint, formula-audit]
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
