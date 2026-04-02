@@ -117,9 +117,9 @@ echo "━━━━━━━━━━━━━━━━━━━━━━━━�
 echo "  MCP setup complete!"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo ""
-echo "  Configured servers:"
-claude mcp list 2>/dev/null | sed 's/^/    /' || true
+echo "  Configured servers: github, filesystem, memory, postgres"
 echo ""
-echo "  To verify: claude mcp list"
-echo "  To remove: claude mcp remove <name>"
+echo "  NOTE: GitHub MCP requires Docker to be running."
+echo "        Start Docker Desktop, then verify with: claude mcp list"
+echo "  To remove a server: claude mcp remove <name>"
 echo ""

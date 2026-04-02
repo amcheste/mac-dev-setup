@@ -107,7 +107,12 @@ call plug#end()
 
 " ── Theme ──────────────────────────────────────────────────────────────────
 let g:gruvbox_contrast_dark = 'medium'
-colorscheme gruvbox
+" Guard: gruvbox may not be installed yet on first run (vim +PlugInstall)
+try
+  colorscheme gruvbox
+catch /^Vim\%((\a\+)\)\=:E185/
+  colorscheme desert
+endtry
 
 " ── Lightline ──────────────────────────────────────────────────────────────
 set laststatus=2
