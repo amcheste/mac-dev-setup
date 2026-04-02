@@ -23,6 +23,25 @@ echo ""
 echo "▶ Preflight checks..."
 PREFLIGHT_OK=1
 
+# Must NOT be running as root / sudo
+if [[ "$(id -u)" -eq 0 ]]; then
+    echo ""
+    echo "  ✗ This script must not be run as root or with sudo."
+    echo ""
+    echo "  Homebrew refuses to run as root. Run setup.sh as your normal"
+    echo "  admin user account — without sudo:"
+    echo ""
+    echo "      bash setup.sh"
+    echo ""
+    echo "  If you saw a 'Homebrew prefix is not writable' error, fix the"
+    echo "  ownership first (as yourself, not root), then re-run:"
+    echo ""
+    echo "      sudo chown -R \$(whoami) \$(brew --prefix)"
+    echo "      bash setup.sh"
+    echo ""
+    exit $FAILED
+fi
+
 # macOS only
 if [[ "$(uname)" != "Darwin" ]]; then
     echo "  ERROR: This setup script is for macOS only."
@@ -51,7 +70,12 @@ if command -v brew &>/dev/null; then
         PREFLIGHT_OK=0
     elif [[ ! -w "$BREW_PREFIX" ]]; then
         echo "  ✗ Homebrew prefix '$BREW_PREFIX' is not writable by this user."
-        echo "    Run:  sudo chown -R \$(whoami) $BREW_PREFIX"
+        echo ""
+        echo "  Fix the ownership (run this once, then re-run setup.sh normally):"
+        echo ""
+        echo "      sudo chown -R \$(whoami) $BREW_PREFIX"
+        echo ""
+        echo "  ⚠  Do NOT re-run setup.sh with sudo — Homebrew refuses to run as root."
         PREFLIGHT_OK=0
     else
         echo "  Homebrew writable ✓"
