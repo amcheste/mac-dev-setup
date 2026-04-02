@@ -1,6 +1,6 @@
 ---
 name: publish-release
-description: Publish a new versioned release. Bumps version on develop, opens a develop→main PR, merges it, tags main, and triggers the release pipeline.
+description: Publish a new versioned release. Opens a version bump PR to develop, merges it, promotes develop to main via PR, tags main, and triggers the release pipeline.
 ---
 
 Publish a new release based on the user's request: $ARGUMENTS
@@ -21,27 +21,38 @@ If the version is ambiguous or missing, ask the user to confirm before proceedin
 4. Confirm `VERSION` file exists in the repo root
 5. Read the current version from `VERSION` and show it to the user before proceeding
 
-## Step 1 — Bump version on develop
+## Step 1 — Version bump PR to develop
 
-Run the bump script:
+Create a short-lived release branch, bump the version, and open a PR to develop:
 
 ```bash
-# Explicit version (including pre-release)
-./scripts/bump-version.sh set <version>
+git checkout -b chore/release-v<version>
 
-# Or a relative increment
-./scripts/bump-version.sh patch   # or minor / major
+# Bump version using the script
+./scripts/bump-version.sh set <version>    # explicit
+./scripts/bump-version.sh patch            # or minor / major
+
+# The script commits with: chore: release v<version>
+# Do NOT push the annotated tag yet — just the commit
+
+git push -u origin chore/release-v<version>
+
+gh pr create \
+  --base develop \
+  --head chore/release-v<version> \
+  --title "chore: release v<version>" \
+  --body "Version bump to v<version>. Merge to proceed with the develop→main release PR."
 ```
 
-The script updates `VERSION`, commits with `chore: release v<version>`, and creates an annotated tag locally. **Do not push the tag yet** — push only the commit:
+Show the user the PR URL. Wait for CI to pass, then ask them to approve and merge it.
+
+## Step 2 — Promote develop → main
+
+After the version bump PR is merged, open the develop→main release PR:
 
 ```bash
-git push origin develop
-```
+git checkout develop && git pull
 
-## Step 2 — Open develop → main PR
-
-```bash
 gh pr create \
   --base main \
   --head develop \
@@ -55,7 +66,7 @@ Show the user the PR URL and ask them to approve and merge it.
 
 ## Step 3 — Tag main after merge
 
-After the user confirms the PR is merged:
+After the user confirms the develop→main PR is merged:
 
 ```bash
 git checkout main && git pull

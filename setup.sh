@@ -19,6 +19,85 @@ echo "  Developer Environment Setup"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo ""
 
+# ── Preflight checks ──────────────────────────────────────────────────────────
+echo "▶ Preflight checks..."
+PREFLIGHT_OK=1
+
+# Must NOT be running as root / sudo
+if [[ "$(id -u)" -eq 0 ]]; then
+    echo ""
+    echo "  ✗ This script must not be run as root or with sudo."
+    echo ""
+    echo "  Homebrew refuses to run as root. Run setup.sh as your normal"
+    echo "  admin user account — without sudo:"
+    echo ""
+    echo "      bash setup.sh"
+    echo ""
+    echo "  If you saw a 'Homebrew prefix is not writable' error, re-run"
+    echo "  setup.sh normally (without sudo) — it will fix the ownership"
+    echo "  automatically by prompting for your password."
+    echo ""
+    exit $FAILED
+fi
+
+# macOS only
+if [[ "$(uname)" != "Darwin" ]]; then
+    echo "  ERROR: This setup script is for macOS only."
+    exit $FAILED
+fi
+
+# Must be an admin account (member of the 'admin' group)
+if ! id -Gn | tr ' ' '\n' | grep -q '^admin$'; then
+    echo ""
+    echo "  ✗ This account is not an administrator."
+    echo ""
+    echo "  Homebrew and most developer tools require admin (sudo) access."
+    echo "  Please run this script from an admin account, or ask your Mac's"
+    echo "  administrator to run it first."
+    echo ""
+    exit $FAILED
+fi
+echo "  Admin account ✓"
+
+# If Homebrew is already installed, make sure it's functional
+if command -v brew &>/dev/null; then
+    BREW_PREFIX="$(brew --prefix 2>/dev/null)" || BREW_PREFIX=""
+    if [[ -z "$BREW_PREFIX" ]]; then
+        echo "  ✗ Homebrew is installed but not functional."
+        echo "    Try: brew update  or reinstall from https://brew.sh"
+        PREFLIGHT_OK=0
+    elif [[ ! -w "$BREW_PREFIX" ]]; then
+        echo "  ✗ Homebrew prefix '$BREW_PREFIX' is not writable by this user."
+        echo "    Attempting to fix ownership of Homebrew directories (sudo required)..."
+        # Only chown the specific subdirs Homebrew uses — not the entire prefix,
+        # which may contain system-managed files (e.g. /usr/local on Intel Macs).
+        BREW_SUBDIRS=()
+        for d in bin Cellar Caskroom etc Frameworks include lib Library opt sbin share var; do
+            [[ -d "$BREW_PREFIX/$d" ]] && BREW_SUBDIRS+=("$BREW_PREFIX/$d")
+        done
+        if [[ ${#BREW_SUBDIRS[@]} -gt 0 ]] && sudo chown -R "$(whoami)" "${BREW_SUBDIRS[@]}" 2>/dev/null; then
+            echo "  Homebrew directory ownership fixed ✓"
+        else
+            echo ""
+            echo "  Could not fix automatically. Run this manually, then re-run setup.sh:"
+            echo ""
+            echo "      sudo chown -R \$(whoami) ${BREW_SUBDIRS[*]:-$BREW_PREFIX}"
+            echo ""
+            echo "  ⚠  Do NOT re-run setup.sh with sudo — Homebrew refuses to run as root."
+            PREFLIGHT_OK=0
+        fi
+    else
+        echo "  Homebrew writable ✓"
+    fi
+fi
+
+if [[ $PREFLIGHT_OK -eq 0 ]]; then
+    echo ""
+    echo "  Please fix the issues above and re-run setup.sh."
+    exit $FAILED
+fi
+echo ""
+
 # ── Repos directory ──────────────────────────────────────────────────────────
 if [[ ! -d "$HOME/Repos" ]]; then
     echo "▶ Creating ~/Repos..."
@@ -47,6 +126,11 @@ echo ""
 echo "▶ Tapping amcheste/mac-dev-setup..."
 brew tap amcheste/mac-dev-setup https://github.com/amcheste/mac-dev-setup 2>/dev/null || true
 
+# Pre-tap third-party taps so brew bundle can resolve their formulae.
+# brew bundle processes taps and formulae together which can cause lookup
+# failures if the tap hasn't been added before the formula is fetched.
+brew tap cirruslabs/cli 2>/dev/null || true
+
 # ── Brew Bundle ──────────────────────────────────────────────────────────────
 echo ""
 echo "▶ Installing packages (this may take a few minutes)..."
@@ -66,7 +150,7 @@ bash "$REPO_DIR/scripts/install-dotfiles.sh" \
 echo ""
 echo "▶ Installing Vim plugins..."
 if [[ -f "$HOME/.vim/autoload/plug.vim" ]]; then
-    vim +PlugInstall +qall 2>/dev/null && echo "  Vim plugins installed ✓" \
+    vim --not-a-term -c "set nomore" +PlugInstall +qall >/dev/null 2>&1 && echo "  Vim plugins installed ✓" \
         || echo "  Warning: vim +PlugInstall had errors (plugins may still be installed)"
 else
     echo "  vim-plug not found — skipping (run: install-dotfiles.sh first)"
