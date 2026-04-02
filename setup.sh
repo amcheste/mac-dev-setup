@@ -33,11 +33,9 @@ if [[ "$(id -u)" -eq 0 ]]; then
     echo ""
     echo "      bash setup.sh"
     echo ""
-    echo "  If you saw a 'Homebrew prefix is not writable' error, fix the"
-    echo "  ownership first (as yourself, not root), then re-run:"
-    echo ""
-    echo "      sudo chown -R \$(whoami) \$(brew --prefix)"
-    echo "      bash setup.sh"
+    echo "  If you saw a 'Homebrew prefix is not writable' error, re-run"
+    echo "  setup.sh normally (without sudo) — it will fix the ownership"
+    echo "  automatically by prompting for your password."
     echo ""
     exit $FAILED
 fi
@@ -70,13 +68,24 @@ if command -v brew &>/dev/null; then
         PREFLIGHT_OK=0
     elif [[ ! -w "$BREW_PREFIX" ]]; then
         echo "  ✗ Homebrew prefix '$BREW_PREFIX' is not writable by this user."
-        echo ""
-        echo "  Fix the ownership (run this once, then re-run setup.sh normally):"
-        echo ""
-        echo "      sudo chown -R \$(whoami) $BREW_PREFIX"
-        echo ""
-        echo "  ⚠  Do NOT re-run setup.sh with sudo — Homebrew refuses to run as root."
-        PREFLIGHT_OK=0
+        echo "    Attempting to fix ownership of Homebrew directories (sudo required)..."
+        # Only chown the specific subdirs Homebrew uses — not the entire prefix,
+        # which may contain system-managed files (e.g. /usr/local on Intel Macs).
+        BREW_SUBDIRS=()
+        for d in bin Cellar Caskroom etc Frameworks include lib Library opt sbin share var; do
+            [[ -d "$BREW_PREFIX/$d" ]] && BREW_SUBDIRS+=("$BREW_PREFIX/$d")
+        done
+        if [[ ${#BREW_SUBDIRS[@]} -gt 0 ]] && sudo chown -R "$(whoami)" "${BREW_SUBDIRS[@]}" 2>/dev/null; then
+            echo "  Homebrew directory ownership fixed ✓"
+        else
+            echo ""
+            echo "  Could not fix automatically. Run this manually, then re-run setup.sh:"
+            echo ""
+            echo "      sudo chown -R \$(whoami) ${BREW_SUBDIRS[*]:-$BREW_PREFIX}"
+            echo ""
+            echo "  ⚠  Do NOT re-run setup.sh with sudo — Homebrew refuses to run as root."
+            PREFLIGHT_OK=0
+        fi
     else
         echo "  Homebrew writable ✓"
     fi

@@ -110,8 +110,8 @@ check "setup.sh exits non-zero when run as root" \
     "$([[ $EXIT_ROOT -ne 0 ]] && echo pass || echo fail)"
 check "setup.sh prints 'must not be run as root' message" \
     "$(grep -q 'must not be run as root' "$OUT_ROOT" && echo pass || echo fail)"
-check "setup.sh prints sudo chown fix hint when run as root" \
-    "$(grep -q 'chown' "$OUT_ROOT" && echo pass || echo fail)"
+check "setup.sh tells user to re-run normally (not sudo) when run as root" \
+    "$(grep -q 'setup.sh normally' "$OUT_ROOT" && echo pass || echo fail)"
 check "setup.sh does not reach package install when run as root" \
     "$(! grep -q 'Installing packages' "$OUT_ROOT" && echo pass || echo fail)"
 
