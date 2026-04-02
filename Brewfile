@@ -31,7 +31,7 @@ brew "helm"
 brew "terraform"
 brew "oci-cli"          # Oracle Cloud
 brew "doctl"            # DigitalOcean CLI
-brew "octant"           # Kubernetes dashboard
+brew "k9s"              # Kubernetes cluster dashboard (terminal UI)
 
 # ── Databases ────────────────────────────────────────────────────────────────
 brew "mongosh"          # MongoDB shell

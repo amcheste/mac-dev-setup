@@ -45,6 +45,8 @@ section "Homebrew"
 check "brew is on PATH" "command -v brew"
 check "cirruslabs/cli tap is active" "brew tap | grep -q cirruslabs/cli"
 check "tart is installed" "command -v tart"
+check "no deprecated formulae in Brewfile" \
+  "! brew bundle check --file=\"\$HOME/Repos/amcheste/mac-dev-setup/Brewfile\" 2>&1 | grep -qi deprecated"
 
 # ── Dotfiles ───────────────────────────────────────────────────────────────────
 
