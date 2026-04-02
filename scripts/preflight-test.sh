@@ -84,6 +84,37 @@ EOF
 echo ""
 echo "━━━ Preflight Unit Tests ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
+# ── Test: root / sudo is rejected ─────────────────────────────────────────────
+echo ""
+echo "── Root / sudo check"
+
+OUT_ROOT="$TMPDIR_ROOT/output-root.txt"
+FAKE_BIN_ROOT="$TMPDIR_ROOT/fake-bin-root"
+mkdir -p "$FAKE_BIN_ROOT"
+
+cat > "$FAKE_BIN_ROOT/id" <<'EOF'
+#!/usr/bin/env bash
+if [[ "${1:-}" == "-u" ]]; then
+    echo "0"
+elif [[ "${1:-}" == "-Gn" ]]; then
+    echo "staff admin everyone"
+else
+    /usr/bin/id "$@"
+fi
+EOF
+chmod +x "$FAKE_BIN_ROOT/id"
+
+PATH="$FAKE_BIN_ROOT:$PATH" bash "$SETUP" > "$OUT_ROOT" 2>&1 && EXIT_ROOT=0 || EXIT_ROOT=$?
+
+check "setup.sh exits non-zero when run as root" \
+    "$([[ $EXIT_ROOT -ne 0 ]] && echo pass || echo fail)"
+check "setup.sh prints 'must not be run as root' message" \
+    "$(grep -q 'must not be run as root' "$OUT_ROOT" && echo pass || echo fail)"
+check "setup.sh tells user to re-run normally (not sudo) when run as root" \
+    "$(grep -q 'setup.sh normally' "$OUT_ROOT" && echo pass || echo fail)"
+check "setup.sh does not reach package install when run as root" \
+    "$(! grep -q 'Installing packages' "$OUT_ROOT" && echo pass || echo fail)"
+
 # ── Test: non-admin account is rejected ───────────────────────────────────────
 echo ""
 echo "── Non-admin account check"
