@@ -45,8 +45,22 @@ jobs:
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
 
-      - name: Install shellcheck
-        run: sudo apt-get install -y shellcheck
+      - name: Install shellcheck and actionlint
+        run: |
+          sudo apt-get install -y shellcheck
+          # actionlint: static checker for GitHub Actions workflow files
+          bash <(curl -sL https://raw.githubusercontent.com/rhysd/actionlint/main/scripts/download-actionlint.bash)
+          sudo mv actionlint /usr/local/bin/
+
+      - name: Lint GitHub Actions workflow files
+        # -shellcheck= disables actionlint's built-in shellcheck runner since
+        # we run shellcheck separately with full control over flags and targets.
+        # -ignore suppresses the untrusted-input warning for workflow outputs
+        # that are generated internally (not user-controlled).
+        run: |
+          actionlint \
+            -shellcheck= \
+            -ignore 'expression value .* may be injected'
 
       - name: Lint shell scripts
         run: |
