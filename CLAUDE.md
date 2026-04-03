@@ -49,7 +49,7 @@ tools, dotfiles, credentials, MCPs, and Claude Code configuration all included.
 - **Branch model:** `main` = latest release (always stable). `develop` = integration branch.
 - Always branch from `develop`, never commit directly to `main` or `develop`
 - PRs always target `develop`
-- `main` is only updated via the develop→main release PR opened by `/publish-release`
+- `main` is only updated via CLI merge (`git merge --no-ff origin/develop`) by `/publish-release` — **never via a GitHub PR**. GitHub's merge button squash-merges by default, dropping ancestry and causing conflicts on the next release.
 - Always open a PR for review before merging
 - Commit messages should be descriptive — explain *why*, not just *what*
 - Conventional commits style: `feat:`, `fix:`, `docs:`, `chore:`
