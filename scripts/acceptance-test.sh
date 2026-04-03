@@ -1,8 +1,11 @@
 #!/usr/bin/env bash
-# Acceptance test suite. Runs INSIDE the Tart VM after setup.sh completes.
+# Acceptance test suite. Run after setup.sh completes on any macOS machine.
+# Works both locally and on GitHub-hosted macOS runners (no VM required).
 # Collects all failures before exiting — does not short-circuit on first error.
 
 set -euo pipefail
+
+REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 # Ensure Homebrew tools are on PATH — this script runs via non-login bash
 # so .zprofile is never sourced.
@@ -43,10 +46,8 @@ check "Homebrew prefix is writable" "test -w \"\$(brew --prefix)\""
 
 section "Homebrew"
 check "brew is on PATH" "command -v brew"
-check "cirruslabs/cli tap is active" "brew tap | grep -q cirruslabs/cli"
-check "tart is installed" "command -v tart"
 check "no deprecated formulae in Brewfile" \
-  "! brew bundle check --file=\"\$HOME/Repos/amcheste/mac-dev-setup/Brewfile\" 2>&1 | grep -qi deprecated"
+  "! brew bundle check --file=\"$REPO_DIR/Brewfile\" 2>&1 | grep -qi deprecated"
 
 # ── Dotfiles ───────────────────────────────────────────────────────────────────
 
