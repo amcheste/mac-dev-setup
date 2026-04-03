@@ -1,4 +1,4 @@
-name: VM Acceptance Test
+name: Acceptance Test
 
 on:
   workflow_dispatch:
@@ -16,29 +16,28 @@ permissions:
 
 jobs:
   acceptance:
-    name: VM Acceptance
+    name: Acceptance
     runs-on: macos-15
-    timeout-minutes: 30
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
 
-      - name: Cache Tart images
-        uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5
-        with:
-          path: ~/.tart
-          key: tart-sequoia-base-${{ hashFiles('scripts/vm-acceptance-test.sh') }}
-          restore-keys: tart-sequoia-base-
-
-      - name: Install Tart
+      # Pre-create ~/.secrets so setup.sh skips the interactive credential wizard.
+      # CI only needs a non-empty ANTHROPIC_API_KEY to satisfy the guard condition.
+      - name: Pre-create ~/.secrets (CI stub)
         run: |
-          brew install cirruslabs/cli/tart
+          printf 'export ANTHROPIC_API_KEY="ci-dummy"\n' > "$HOME/.secrets"
+          chmod 600 "$HOME/.secrets"
 
-      - name: Install sshpass
-        run: brew install hudochenkov/sshpass/sshpass
+      # Run setup.sh end-to-end on a fresh macOS runner, using the CI Brewfile
+      # to skip heavy GUI casks. This is functionally equivalent to a real machine
+      # install — the runner is a clean macOS environment on every job.
+      - name: Run setup.sh (CI Brewfile)
+        run: BREWFILE="$GITHUB_WORKSPACE/Brewfile.ci" bash setup.sh
+        timeout-minutes: 35
 
-      - name: Run VM acceptance test
-        run: bash scripts/vm-acceptance-test.sh
-        timeout-minutes: 25
+      - name: Run acceptance tests
+        run: bash scripts/acceptance-test.sh
 
       - name: Upload logs on failure
         if: failure()
