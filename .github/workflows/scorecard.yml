@@ -14,6 +14,7 @@ jobs:
   analysis:
     name: Scorecard Analysis
     runs-on: ubuntu-latest
+    continue-on-error: true  # Scorecard requires a public repo — fails silently on private repos
     permissions:
       security-events: write
       id-token: write
