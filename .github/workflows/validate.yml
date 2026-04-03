@@ -11,6 +11,33 @@ permissions:
   contents: read
 
 jobs:
+  # ── Job 0: Detect changed files (PR only) ─────────────────────────────────
+  # Formula Audit and Integration Test run on macOS runners (10× cost).
+  # Skip them entirely when a PR only touches CI/workflow files.
+  detect-changes:
+    name: Detect Changed Files
+    runs-on: ubuntu-latest
+    outputs:
+      source_changed: ${{ steps.filter.outputs.source }}
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        with:
+          fetch-depth: 0
+
+      - name: Check for source file changes
+        id: filter
+        run: |
+          # On non-PR events (push to main/develop, workflow_call, tags) always run.
+          if [[ "${{ github.event_name }}" != "pull_request" ]]; then
+            echo "source=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          # On PRs: skip macOS jobs if every changed file is under .github/
+          git diff --name-only "origin/${{ github.base_ref }}...HEAD" \
+            | grep -qvE '^\.github/' \
+            && echo "source=true" >> "$GITHUB_OUTPUT" \
+            || echo "source=false" >> "$GITHUB_OUTPUT"
+
   # ── Job 1: Lint (fast, runs on Linux) ──────────────────────────────────────
   lint:
     name: Lint
@@ -132,6 +159,8 @@ jobs:
   formula-audit:
     name: Formula Audit
     runs-on: macos-latest
+    needs: [lint, detect-changes]
+    if: needs.detect-changes.outputs.source_changed == 'true'
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
 
@@ -147,7 +176,8 @@ jobs:
   integration:
     name: Integration Test
     runs-on: macos-latest
-    needs: [lint, formula-audit]
+    needs: [lint, formula-audit, detect-changes]
+    if: needs.detect-changes.outputs.source_changed == 'true'
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
 
