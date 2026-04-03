@@ -30,5 +30,6 @@ jobs:
 
       - uses: github/codeql-action/upload-sarif@5c8a8a642e79153f5d047b10ec1cba1d1cc65699 # v3
         if: always() && github.ref == 'refs/heads/main'
+        continue-on-error: true
         with:
           sarif_file: semgrep.sarif
