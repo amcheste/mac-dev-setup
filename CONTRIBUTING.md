@@ -40,17 +40,18 @@ git checkout develop
 
 ---
 
-## Branch Model
+## Branching, Commits, and Releases
 
-| Branch | Purpose |
-|--------|---------|
-| `main` | Always equals the latest published release — stable, never directly committed to |
-| `develop` | Integration branch — all PRs target here |
-| `feature/*`, `fix/*`, etc. | Short-lived branches off `develop` |
+The branching strategy, commit convention, and release process follow the canonical rules documented in Alan's engineering handbook:
 
-PRs go to `develop`. When enough changes accumulate for a release, `develop` is promoted to `main` via the `/publish-release` skill, which opens the develop→main PR automatically.
+- **Why:** [Branching Strategy philosophy](https://github.com/amcheste/engineering-handbook/blob/main/docs/philosophies/branching-strategy.md)
+- **How:** [Branching & Releases workflow](https://github.com/amcheste/engineering-handbook/blob/main/docs/workflows/branching-and-releases.md)
 
-## Development Workflow
+In short: branch from `develop`, one logical change per PR, [Conventional Commits](https://www.conventionalcommits.org/) (`feat:` / `fix:` / `docs:` / `chore:`, `!` for breaking), and releases are cut by `/publish-release` with a CLI merge from `develop` to `main` (never GitHub's merge button).
+
+---
+
+## Development Workflow (repo-local)
 
 Run `shellcheck` on any modified scripts before committing:
 ```bash
@@ -76,21 +77,6 @@ that is not a GUI cask must also appear in `Brewfile.ci`.
 
 ---
 
-## Commit Convention
-
-This project uses [Conventional Commits](https://www.conventionalcommits.org/):
-
-| Prefix | Use |
-|--------|-----|
-| `feat:` | New tool, script, or workflow capability |
-| `fix:` | Bug fix in a script or workflow |
-| `docs:` | README, CHANGELOG, or inline comment changes |
-| `chore:` | Version bumps, dependency updates, housekeeping |
-
-One logical change per PR. Keep commits atomic and the history readable.
-
----
-
 ## Running Acceptance Tests
 
 **Locally (requires Tart):**
@@ -105,26 +91,3 @@ This boots a fresh Sequoia base image, runs `setup.sh` inside the VM, and execut
 [VM Acceptance Test](../../actions/workflows/acceptance.yml) workflow.
 The acceptance workflow also runs automatically on every `v*.*.*` release tag as part of the
 release gate.
-
----
-
-## Release Process
-
-> Only the repo owner publishes releases.
-
-Releases are handled by the `/publish-release` Claude Code skill, which automates the full flow:
-
-1. Bumps version on `develop`, commits `chore: release v<version>`
-2. Opens a PR: `develop → main`
-3. Owner approves and merges the PR
-4. Tags `main` with `v<version>` and pushes the tag
-5. Release pipeline fires automatically: validate → VM acceptance → publish
-
-To trigger manually:
-```bash
-# In Claude Code
-/publish-release 1.0.0
-
-# Or via bump script directly (then follow the steps above)
-./scripts/bump-version.sh patch   # or minor / major / set <version>
-```
