@@ -13,7 +13,17 @@ Extract from the user's message:
 ## Pre-flight
 
 1. Verify the repo exists: `gh repo view <owner/repo>`
-2. Show the user what you're about to do and confirm before making any changes
+2. **Refuse forks.** `setup-repo` configures the conventions of the *owner* of the repo. A fork is owned by upstream's conventions, not yours — applying your branching model, protections, and CODEOWNERS to it is wrong:
+
+   ```bash
+   if [ "$(gh repo view <owner/repo> --json isFork --jq .isFork)" = "true" ]; then
+     echo "ERROR: <owner/repo> is a fork. setup-repo follows your conventions; forks follow upstream's. Aborting."
+     exit 1
+   fi
+   ```
+
+   This also applies to audit scripts that survey "all my repos" — use `gh repo list --source` (filters out forks) instead of plain `gh repo list` so forks don't surface in the report.
+3. Show the user what you're about to do and confirm before making any changes
 
 ## Step 1 — Ensure develop branch exists
 
