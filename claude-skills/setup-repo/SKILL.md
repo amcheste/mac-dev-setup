@@ -1,6 +1,6 @@
 ---
 name: setup-repo
-description: Apply standard branch model, protection rules, and settings to a GitHub repository. Creates develop branch, sets it as default, protects develop and main, and adds tag protection.
+description: Apply standard branch model, protection rules, and settings to a GitHub repository. Creates develop branch, sets it as default, protects develop and main, adds tag protection, and verifies CODEOWNERS routing.
 ---
 
 Configure a GitHub repository with the standard branch model and protection rules: $ARGUMENTS
@@ -13,7 +13,17 @@ Extract from the user's message:
 ## Pre-flight
 
 1. Verify the repo exists: `gh repo view <owner/repo>`
-2. Show the user what you're about to do and confirm before making any changes
+2. **Refuse forks.** `setup-repo` configures the conventions of the *owner* of the repo. A fork is owned by upstream's conventions, not yours — applying your branching model, protections, and CODEOWNERS to it is wrong:
+
+   ```bash
+   if [ "$(gh repo view <owner/repo> --json isFork --jq .isFork)" = "true" ]; then
+     echo "ERROR: <owner/repo> is a fork. setup-repo follows your conventions; forks follow upstream's. Aborting."
+     exit 1
+   fi
+   ```
+
+   This also applies to audit scripts that survey "all my repos" — use `gh repo list --source` (filters out forks) instead of plain `gh repo list` so forks don't surface in the report.
+3. Show the user what you're about to do and confirm before making any changes
 
 ## Step 1 — Ensure develop branch exists
 
@@ -126,9 +136,35 @@ gh api repos/<owner/repo>/rulesets \
 EOF
 ```
 
+## Step 6 — Verify CODEOWNERS routing
+
+Bot-authored PRs (via the `amcheste-ai-agent` GitHub App) need
+`.github/CODEOWNERS` to auto-route review requests to a human reviewer.
+Without this file, App-authored PRs don't appear in any reviewer's
+queue (Graphite, GitHub's review-requested filter, etc.) and get lost.
+
+```bash
+gh api repos/<owner/repo>/contents/.github/CODEOWNERS >/dev/null 2>&1 \
+  && echo "✓ CODEOWNERS exists" \
+  || echo "⚠ CODEOWNERS missing"
+```
+
+If the file is missing, **do not write it directly** — `setup-repo` only
+configures settings/rulesets, never commits to the repo. Instead, surface
+the gap in the summary so the user can add it via a PR. The canonical
+default content is:
+
+```
+# See https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+* @amcheste
+```
+
+This pairs with the bot-account model documented in the
+[engineering handbook](https://github.com/amcheste/engineering-handbook/blob/main/docs/design/claude-bot-account.md).
+
 ## Summary
 
-Report what was configured:
+Report what was configured (and any gaps that need a follow-up PR):
 
 ```
 ✓ develop branch created (or already existed)
@@ -136,9 +172,11 @@ Report what was configured:
 ✓ develop protected — require PR + [checks]
 ✓ main protected — require PR + [checks]
 ✓ Tag ruleset active — v* tags protected
+✓/⚠ CODEOWNERS verified (or: CODEOWNERS missing — see follow-ups)
 
 Next steps:
 - If using repo-template: copy .github/ files into this repo
 - Add project-specific lint/test steps to .github/workflows/validate.yml
 - Update required status check names to match your workflow job names
+- If CODEOWNERS was missing, open a PR adding `.github/CODEOWNERS` with `* @amcheste`
 ```
