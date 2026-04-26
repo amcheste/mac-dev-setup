@@ -53,7 +53,31 @@ gh api repos/<owner/repo> \
   --jq '.default_branch'
 ```
 
-## Step 3 — Protect develop
+## Step 3 — Set merge policy: disable squash, default to rebase
+
+Squash-merging is destructive when bot-authored PRs are merged by a human:
+the squash commit replaces the bot's primary authorship with the merger, and
+GitHub silently drops the `Co-Authored-By` trailers (so the human steering
+the bot loses contribution-graph credit, and `git blame` no longer reflects
+who actually wrote the code). Rebase merge preserves per-commit authorship
+and trailers; merge commits stay enabled as a fallback for ceremonial merges
+like the CLI `--no-ff` `develop → main` release promotion.
+
+```bash
+gh api repos/<owner/repo> \
+  --method PATCH \
+  --field allow_squash_merge=false \
+  --field allow_rebase_merge=true \
+  --field allow_merge_commit=true \
+  --jq '{allow_squash_merge, allow_rebase_merge, allow_merge_commit}'
+```
+
+The convention alone isn't enough — without disabling squash at the repo
+level, the wrong button eventually gets clicked. See
+[engineering handbook → merge strategy](https://github.com/amcheste/engineering-handbook/blob/main/docs/philosophies/merge-strategy.md)
+for the full reasoning.
+
+## Step 4 — Protect develop
 
 Require a PR and status checks before merging. Check if `.github/workflows/validate.yml` exists in the repo to know which checks to require:
 
@@ -84,7 +108,7 @@ gh api repos/<owner/repo>/branches/develop/protection \
 EOF
 ```
 
-## Step 4 — Protect main
+## Step 5 — Protect main
 
 Require a PR before merging. No direct pushes. No Commit Lint check required here (the develop→main release PR is a `chore:` commit which is valid, but having it as a required check on main is redundant).
 
@@ -109,7 +133,7 @@ gh api repos/<owner/repo>/branches/main/protection \
 EOF
 ```
 
-## Step 5 — Tag protection ruleset
+## Step 6 — Tag protection ruleset
 
 Prevent accidental creation, deletion, or force-moving of `v*` tags:
 
@@ -136,7 +160,7 @@ gh api repos/<owner/repo>/rulesets \
 EOF
 ```
 
-## Step 6 — Verify CODEOWNERS routing
+## Step 7 — Verify CODEOWNERS routing
 
 Bot-authored PRs (via the `amcheste-ai-agent` GitHub App) need
 `.github/CODEOWNERS` to auto-route review requests to a human reviewer.
@@ -169,6 +193,7 @@ Report what was configured (and any gaps that need a follow-up PR):
 ```
 ✓ develop branch created (or already existed)
 ✓ develop set as default branch
+✓ Merge policy: squash disabled, rebase + merge enabled
 ✓ develop protected — require PR + [checks]
 ✓ main protected — require PR + [checks]
 ✓ Tag ruleset active — v* tags protected
