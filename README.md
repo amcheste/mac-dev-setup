@@ -7,9 +7,9 @@
 **An agentic-forward macOS developer environment — from zero to productive in one command.**
 
 [![Validate](https://github.com/amcheste/mac-dev-setup/actions/workflows/validate.yml/badge.svg)](https://github.com/amcheste/mac-dev-setup/actions/workflows/validate.yml)
-[![Version](https://img.shields.io/github/v/tag/amcheste/mac-dev-setup?label=version&sort=semver)](https://github.com/amcheste/mac-dev-setup/releases)
+[![Version](https://img.shields.io/github/v/tag/amcheste/mac-dev-setup?label=version&sort=semver&color=0B0B0C)](https://github.com/amcheste/mac-dev-setup/releases)
 [![macOS](https://img.shields.io/badge/macOS-Sequoia%2B-000000?logo=apple&logoColor=white)](https://www.apple.com/macos/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![License: MIT](https://img.shields.io/badge/License-MIT-1F4D3A.svg)](LICENSE)
 [![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/amcheste/mac-dev-setup/badge)](https://scorecard.dev/viewer/?uri=github.com/amcheste/mac-dev-setup)
 
 </div>
