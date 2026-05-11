@@ -1,4 +1,4 @@
-# CLAUDE.md — mac-dev-setup
+# CLAUDE.md. Mac-dev-setup
 
 This file is read by Claude Code at the start of every session in this repo.
 It captures developer preferences, project conventions, and accumulated knowledge.
@@ -8,16 +8,16 @@ It captures developer preferences, project conventions, and accumulated knowledg
 ## About This Repo
 
 This is a personal macOS developer environment managed as a Homebrew tap.
-The goal is a single command that gets a machine from zero to fully productive —
-tools, dotfiles, credentials, MCPs, and Claude Code configuration all included.
+The goal is a single command that gets a machine from zero to fully productive,
+with tools, dotfiles, credentials, MCPs, and Claude Code configuration all included.
 
 **Key files:**
-- `setup.sh` — bootstrap entry point (run on a fresh machine)
-- `Brewfile` — full package list including GUI casks
-- `Brewfile.ci` — CLI-only subset used in CI (no heavy casks)
-- `Formula/dev-tools.rb` — Homebrew formula for the tap
-- `dotfiles/` — zshrc, vimrc, secrets.template (symlinked into $HOME)
-- `scripts/` — install-dotfiles, setup-credentials, setup-mcps, upgrade
+- `setup.sh`. Bootstrap entry point (run on a fresh machine)
+- `Brewfile`. Full package list including GUI casks
+- `Brewfile.ci`. CLI-only subset used in CI (no heavy casks)
+- `Formula/dev-tools.rb`. Homebrew formula for the tap
+- `dotfiles/`. Zshrc, vimrc, secrets.template (symlinked into $HOME)
+- `scripts/`. Install-dotfiles, setup-credentials, setup-mcps, upgrade
 
 ---
 
@@ -30,17 +30,17 @@ tools, dotfiles, credentials, MCPs, and Claude Code configuration all included.
 
 ### Shell
 - Shell: **zsh**
-- Prompt is minimal (`%n:%1~ $ `) — no heavy frameworks like oh-my-zsh
+- Prompt is minimal (`%n:%1~ $ `). No heavy frameworks like oh-my-zsh
 - Aliases and functions live in `dotfiles/zshrc`, not scattered elsewhere
 
 ### Languages
-- **Go** — preferred for backend services and CLI tools
-- **Python** — scripting, data work, AI integrations
-- **Java** — enterprise/existing projects (Maven)
-- **Node/TypeScript** — frontend and MCP server work
+- **Go**. Preferred for backend services and CLI tools
+- **Python**. Scripting, data work, AI integrations
+- **Java**. Enterprise/existing projects (Maven)
+- **Node/TypeScript**. Frontend and MCP server work
 
 ### Cloud & Infrastructure
-- **OCI (Oracle Cloud)** and **DigitalOcean** — both actively used
+- **OCI (Oracle Cloud)** and **DigitalOcean**. Both actively used
 - **Kubernetes** locally via `kind`, remotely via OCI/DO clusters
 - **ArgoCD** for GitOps deployments
 - **Terraform** for infrastructure as code
@@ -49,14 +49,14 @@ tools, dotfiles, credentials, MCPs, and Claude Code configuration all included.
 - **Branch model:** `main` = latest release (always stable). `develop` = integration branch.
 - Always branch from `develop`, never commit directly to `main` or `develop`
 - PRs always target `develop`
-- `main` is only updated via CLI merge (`git merge --no-ff origin/develop`) by `/publish-release` — **never via a GitHub PR**. GitHub's merge button squash-merges by default, dropping ancestry and causing conflicts on the next release.
+- `main` is only updated via CLI merge (`git merge --no-ff origin/develop`) by `/publish-release`. **never via a GitHub PR**. GitHub's merge button squash-merges by default, dropping ancestry and causing conflicts on the next release.
 - Always open a PR for review before merging
-- Commit messages should be descriptive — explain *why*, not just *what*
+- Commit messages should be descriptive. Explain *why*, not just *what*
 - Conventional commits style: `feat:`, `fix:`, `docs:`, `chore:`
 
 ### Scripting Standards
 - All shell scripts must pass `shellcheck` with no warnings
-- Scripts should be idempotent — safe to run multiple times
+- Scripts should be idempotent. Safe to run multiple times
 - Always use `set -euo pipefail` at the top of bash scripts
 - Prefer explicit error messages over silent failures
 
@@ -67,7 +67,7 @@ tools, dotfiles, credentials, MCPs, and Claude Code configuration all included.
   act pull_request -j lint           # lint job only
   act pull_request -j formula-audit  # formula audit only
   ```
-- `Brewfile.ci` exists for fast CI runs — add new CLI tools there too
+- `Brewfile.ci` exists for fast CI runs. Add new CLI tools there too
 - See `TESTING.md` for full acceptance testing options
 
 ### Secrets & Credentials
@@ -118,11 +118,11 @@ See `VERSIONING.md` for the full versioning scheme.
 
 > **How this section works:** As Claude works with you across sessions and notices
 > a consistent pattern or preference, it should suggest adding it here as a one-liner.
-> You review, refine, and commit it. This keeps durable knowledge in the repo —
+> You review, refine, and commit it. This keeps durable knowledge in the repo:
 > not session-specific questions, but things that should be true on a clean install.
 
 <!-- Preferences are added here over time as they are discovered -->
 - Prefer interactive scripts with clear progress output (use `▶` prefix for steps, `✓` for success)
 - Prefer ASCII art / box-drawing separators (`━━━`) over plain `---` in terminal output
-- Keep CI fast — integration test should complete under 5 minutes
+- Keep CI fast. Integration test should complete under 5 minutes
 - GUI cask installs are always deferred to manual or `setup.sh`, never required in CI

@@ -13,11 +13,11 @@ It is published openly so others can learn from it, fork it, and adapt it for th
 - **PRs are welcome** for genuine bugs, broken tooling, or improvements that are broadly useful
   and not preference-specific.
 - **Preference PRs will generally be declined.** If you prefer a different shell, editor, color
-  scheme, or aliasing style — fork it. This repo is not a general-purpose tool; it is a specific
+  scheme, or aliasing style. Fork it. This repo is not a general-purpose tool; it is a specific
   person's environment.
 - **Alan has final say** on what goes into this repo. A PR may be well-written, well-tested, and
   genuinely useful, and still be declined because it doesn't fit how Alan works. That is not a
-  reflection of your contribution quality — it just isn't the right repo for it.
+  reflection of your contribution quality. It just isn't the right repo for it.
 
 If you are building your own environment, fork this repo and make it yours.
 If you've found something that is broken or outdated in a way that affects everyone, open a PR.
@@ -27,9 +27,9 @@ If you've found something that is broken or outdated in a way that affects every
 ## Getting Started (for contributors)
 
 **Prerequisites:**
-- [`shellcheck`](https://github.com/koalaman/shellcheck) — `brew install shellcheck`
-- [`act`](https://github.com/nektos/act) — `brew install act` — local GitHub Actions runner
-- [`tart`](https://github.com/cirruslabs/tart) — `brew install cirruslabs/cli/tart` — VM acceptance tests
+- [`shellcheck`](https://github.com/koalaman/shellcheck). `brew install shellcheck`
+- [`act`](https://github.com/nektos/act). `brew install act`. Local GitHub Actions runner
+- [`tart`](https://github.com/cirruslabs/tart). `brew install cirruslabs/cli/tart`. VM acceptance tests
 
 Fork and clone to the standard path:
 ```bash
@@ -70,10 +70,10 @@ that is not a GUI cask must also appear in `Brewfile.ci`.
 
 ## Adding a Tool
 
-1. **Brewfile** — add the formula. If it is a CLI tool, add it to `Brewfile.ci` as well.
-2. **Dotfiles** — add relevant aliases or configuration to `dotfiles/zshrc`.
-3. **Validate smoke test** — add `command -v <tool>` to the smoke-test step in `.github/workflows/validate.yml`.
-4. **README table** — add a row to the appropriate table in `README.md`.
+1. **Brewfile**. Add the formula. If it is a CLI tool, add it to `Brewfile.ci` as well.
+2. **Dotfiles**. Add relevant aliases or configuration to `dotfiles/zshrc`.
+3. **Validate smoke test**. Add `command -v <tool>` to the smoke-test step in `.github/workflows/validate.yml`.
+4. **README table**. Add a row to the appropriate table in `README.md`.
 
 ---
 

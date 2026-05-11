@@ -4,7 +4,7 @@
 
 # mac-dev-setup
 
-**An agentic-forward macOS developer environment — from zero to productive in one command.**
+**An agentic-forward macOS developer environment. From zero to productive in one command.**
 
 [![Validate](https://github.com/amcheste/mac-dev-setup/actions/workflows/validate.yml/badge.svg)](https://github.com/amcheste/mac-dev-setup/actions/workflows/validate.yml)
 [![Version](https://img.shields.io/github/v/tag/amcheste/mac-dev-setup?label=version&sort=semver&color=0B0B0C)](https://github.com/amcheste/mac-dev-setup/releases)
@@ -16,7 +16,7 @@
 
 ---
 
-Setting up a new Mac — or recovering from a disaster — should take minutes, not days.
+Setting up a new Mac. Or recovering from a disaster. Should take minutes, not days.
 This repo automates everything: Homebrew packages, GUI apps, dotfiles, Vim plugins, credentials, and a fully configured [Claude Code](https://claude.ai/claude-code) environment with MCP servers wired in from day one.
 
 ```bash
@@ -28,27 +28,27 @@ bash ~/Repos/amcheste/mac-dev-setup/setup.sh
 
 ---
 
-## Agentic Development — Built In
+## Agentic Development. Built In
 
-This isn't just a tool installer. It sets up **Claude Code** as a first-class part of the development workflow — configured to know how you work, what you build, and how you prefer to do it.
+This isn't just a tool installer. It sets up **Claude Code** as a first-class part of the development workflow. Configured to know how you work, what you build, and how you prefer to do it.
 
 ### Claude Code Configuration
 
 A `CLAUDE.md` file in this repo captures your development preferences so Claude Code understands your environment from the first session on any machine:
 
-- **Tooling** — Vim, Zsh, Go/Python/Java/Node, OCI + DigitalOcean, Kubernetes via `kind`
-- **Git workflow** — always branch, always PR, conventional commits, descriptive messages
-- **Shell standards** — `shellcheck`-clean scripts, `set -euo pipefail`, idempotent installs
-- **Project conventions** — how to test with `act`, when to update `Brewfile.ci`, how to add tools
+- **Tooling**. Vim, Zsh, Go/Python/Java/Node, OCI + DigitalOcean, Kubernetes via `kind`
+- **Git workflow**. Always branch, always PR, conventional commits, descriptive messages
+- **Shell standards**. `shellcheck`-clean scripts, `set -euo pipefail`, idempotent installs
+- **Project conventions**. How to test with `act`, when to update `Brewfile.ci`, how to add tools
 
-### Learned Preferences — A Model That Grows With You
+### Learned Preferences. A Model That Grows With You
 
 The `CLAUDE.md` has a **Learned Preferences** section that acts as a living record of how you work.
-As Claude Code works with you across sessions and notices consistent patterns — how you structure commits, which shortcuts you reach for, what output format you prefer — those observations get added back here and committed. Not session-specific questions, but durable preferences that should be true on every clean install.
+As Claude Code works with you across sessions and notices consistent patterns. How you structure commits, which shortcuts you reach for, what output format you prefer. Those observations get added back here and committed. Not session-specific questions, but durable preferences that should be true on every clean install.
 
-Over time, this file becomes a precise picture of your development style. New machine, new team member, new context — Claude Code picks it all up instantly.
+Over time, this file becomes a precise picture of your development style. New machine, new team member, new context. Claude Code picks it all up instantly.
 
-### MCP Servers — Claude Wired Into Your Stack
+### MCP Servers. Claude Wired Into Your Stack
 
 `setup.sh` automatically configures [MCP servers](https://modelcontextprotocol.io) so Claude Code has direct access to your development infrastructure:
 
@@ -56,7 +56,7 @@ Over time, this file becomes a precise picture of your development style. New ma
 |-----|--------------------|
 | **GitHub** | Read/write PRs, issues, Actions runs, code search, releases |
 | **Filesystem** | Navigate `~/Repos`, `~/Documents`, `~/.claude` beyond the active project |
-| **Memory** | Persist facts across sessions — supplements `CLAUDE.md` with dynamic context |
+| **Memory** | Persist facts across sessions. Supplements `CLAUDE.md` with dynamic context. |
 | **PostgreSQL** | Query local and dev databases directly in conversation |
 
 To reconfigure MCPs: `bash scripts/setup-mcps.sh`
@@ -70,26 +70,26 @@ To reconfigure MCPs: `bash scripts/setup-mcps.sh`
 | Tool | Version Management |
 |------|--------------------|
 | Go | Direct via Homebrew |
-| Python | `pyenv` — switch versions per project |
-| Node.js | `nvm` — switch versions per project |
+| Python | `pyenv`, switch versions per project |
+| Node.js | `nvm`, switch versions per project |
 | Java | OpenJDK + Maven |
 
 ### Cloud & Infrastructure
 
 | Tool | Purpose |
 |------|---------|
-| `kubectl` + `kind` | Kubernetes — local clusters and remote |
+| `kubectl` + `kind` | Kubernetes, local clusters and remote |
 | `helm` | Kubernetes package manager |
 | `terraform` | Infrastructure as code |
 | `oci-cli` | Oracle Cloud Platform |
 | `doctl` | DigitalOcean CLI |
-| `gh` | GitHub CLI — PRs, releases, Actions |
+| `gh` | GitHub CLI, PRs, releases, Actions |
 
 ### Developer Utilities
 
 | Tool | Why It's Here |
 |------|--------------|
-| `fzf` | Fuzzy finder — wired into shell history and Vim |
+| `fzf` | Fuzzy finder, wired into shell history and Vim |
 | `ripgrep` | 10x faster than grep, respects `.gitignore` |
 | `fd` | Faster `find` with sane defaults |
 | `bat` | `cat` with syntax highlighting and line numbers |
@@ -111,7 +111,7 @@ To reconfigure MCPs: `bash scripts/setup-mcps.sh`
 
 ## Dotfiles
 
-Shell and editor configs live in `dotfiles/` and are **symlinked** into `$HOME` — edits in this repo take effect immediately, and `git diff` always shows what's changed.
+Shell and editor configs live in `dotfiles/` and are **symlinked** into `$HOME`. Edits in this repo take effect immediately, and `git diff` always shows what's changed.
 
 ```
 dotfiles/
@@ -124,11 +124,11 @@ dotfiles/
 
 The `vimrc` turns Vim into a proper IDE without an IDE's weight:
 
-- **[vim-plug](https://github.com/junegunn/vim-plug)** — plugin manager, auto-bootstrapped
-- **[ALE](https://github.com/dense-analysis/ale)** — async lint and fix on save (`goimports`, `black`, `tflint`)
-- **[vim-go](https://github.com/fatih/vim-go)** — Go development (goimports, highlighting, `:GoBuild`)
-- **[fzf.vim](https://github.com/junegunn/fzf.vim)** — fuzzy file/buffer/grep search (`<leader>f`, `<leader>r`)
-- **[gruvbox](https://github.com/morhetz/gruvbox)** — colorscheme
+- **[vim-plug](https://github.com/junegunn/vim-plug)**. Plugin manager, auto-bootstrapped
+- **[ALE](https://github.com/dense-analysis/ale)**. Async lint and fix on save (`goimports`, `black`, `tflint`)
+- **[vim-go](https://github.com/fatih/vim-go)**. Go development (goimports, highlighting, `:GoBuild`)
+- **[fzf.vim](https://github.com/junegunn/fzf.vim)**. Fuzzy file/buffer/grep search (`<leader>f`, `<leader>r`)
+- **[gruvbox](https://github.com/morhetz/gruvbox)**. Colorscheme
 - **[NERDTree](https://github.com/preservim/nerdtree)**, **[lightline](https://github.com/itchyny/lightline.vim)**, **[vim-fugitive](https://github.com/tpope/vim-fugitive)**
 - Filetype-aware indent: real tabs for Go, 2-space for YAML/Terraform/JSON, PEP8 for Python
 
@@ -136,7 +136,7 @@ The `vimrc` turns Vim into a proper IDE without an IDE's weight:
 
 ## Secrets Management
 
-Credentials live in `~/.secrets` — `chmod 600`, sourced by `.zshrc`, and **never committed**.
+Credentials live in `~/.secrets`. `chmod 600`, sourced by `.zshrc`, and **never committed**.
 
 On first run, `setup.sh` launches an interactive wizard that populates it:
 
@@ -196,7 +196,7 @@ Five automated workflows keep the environment reliable across every change and r
 | Workflow | Trigger | Purpose |
 |----------|---------|---------|
 | **Validate** | Every PR + push to `main` | Lint, shellcheck, formula audit, macOS integration test, commit lint + semver suggestion |
-| **VM Acceptance** | Release tags + manual | Full install in a clean Tart VM — the release gate |
+| **VM Acceptance** | Release tags + manual | Full install in a clean Tart VM, the release gate |
 | **Release** | `v*.*.*` tags | Validate → acceptance → publish release |
 | **Release Drafter** | PR open/update + push to `main` | Auto-labels PRs by type, drafts release notes |
 | **Label PR** | PR open/update | Adds content labels (`brew`, `scripts`, `dotfiles`, `ci`) |
@@ -287,7 +287,7 @@ Push with `git push && git push --tags` to trigger the release pipeline. See **[
 
 ## Testing
 
-CI runs on every pull request against a real macOS runner. For full acceptance testing — including GUI casks and the interactive setup flow — see **[TESTING.md](TESTING.md)** for five options ranging from a local macOS user account to a UTM virtual machine.
+CI runs on every pull request against a real macOS runner. For full acceptance testing. Including GUI casks and the interactive setup flow. See **[TESTING.md](TESTING.md)** for five options ranging from a local macOS user account to a UTM virtual machine.
 
 | Method | Covers Casks | Clean State | Effort |
 |--------|-------------|-------------|--------|
@@ -311,9 +311,9 @@ Pairs with **Meslo LG Nerd Font** (installed automatically by the Brewfile).
 
 ## Contributing
 
-This is Alan Chester's personal development environment. It is open for others to **fork and adapt** for their own use — that is the primary use case for anyone other than the owner.
+This is Alan Chester's personal development environment. It is open for others to **fork and adapt** for their own use. That is the primary use case for anyone other than the owner.
 
-Bug fixes and improvements that are genuinely broadly useful are welcome as pull requests. Preference-based changes will generally be declined — if the defaults don't fit your workflow, fork it and make it yours.
+Bug fixes and improvements that are genuinely broadly useful are welcome as pull requests. Preference-based changes will generally be declined. If the defaults don't fit your workflow, fork it and make it yours.
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for the full contribution guide, development workflow, and release process.
 
@@ -323,4 +323,4 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for the full contribution guide, developm
 
 Released under the [MIT License](LICENSE).
 
-You are free to use, fork, modify, and distribute this project for any purpose. No warranty is provided — this is a personal environment, not a supported product.
+You are free to use, fork, modify, and distribute this project for any purpose. No warranty is provided. This is a personal environment, not a supported product.
