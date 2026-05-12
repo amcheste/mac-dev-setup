@@ -1,6 +1,8 @@
-<div align="center">
+<p align="center">
+  <img src="assets/banner.svg" alt="mac-dev-setup · trace: installing Homebrew → symlinking dotfiles → configuring credentials → wiring MCP servers → installing Claude Code · δ: productive" width="100%">
+</p>
 
-<img src="assets/logo.png" alt="mac-dev-setup mascot" width="200" />
+<div align="center">
 
 # mac-dev-setup
 
