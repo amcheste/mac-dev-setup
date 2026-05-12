@@ -5,7 +5,7 @@ on:
   schedule:
     - cron: '30 1 * * 1'  # Every Monday at 01:30 UTC
   push:
-    branches: [main]
+    branches: [main, develop]
   workflow_dispatch:
 
 permissions: read-all
@@ -29,8 +29,8 @@ jobs:
         with:
           results_file: results.sarif
           results_format: sarif
-          # Only publish to scorecard.dev from main — the action enforces this
-          publish_results: ${{ github.ref == 'refs/heads/main' }}
+          # Publish to scorecard.dev only from the default branch.
+          publish_results: ${{ github.ref_name == github.event.repository.default_branch }}
 
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
@@ -39,7 +39,7 @@ jobs:
           retention-days: 5
 
       - uses: github/codeql-action/upload-sarif@e46ed2cbd01164d986452f91f178727624ae40d7 # v4
-        if: github.ref == 'refs/heads/main'
+        if: github.ref_name == github.event.repository.default_branch
         continue-on-error: true
         with:
           sarif_file: results.sarif

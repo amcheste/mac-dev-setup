@@ -28,9 +28,9 @@ Security-relevant areas in this project:
 
 | Area | Concern |
 |------|---------|
-| `dotfiles/secrets.template` | Must never contain real credentials — only placeholder slots |
+| `dotfiles/secrets.template` | Must never contain real credentials, only placeholder slots |
 | `scripts/setup-credentials.sh` | Credential prompting and `~/.secrets` file handling |
-| `setup.sh` | Bootstrap execution — runs with user privileges on a fresh machine |
+| `setup.sh` | Bootstrap execution, runs with user privileges on a fresh machine |
 | `.github/workflows/` | CI/CD pipeline integrity and secret handling |
 
 ## Out of Scope

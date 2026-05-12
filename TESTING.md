@@ -1,6 +1,6 @@
 # Testing Guide
 
-This document describes every layer of testing available for `mac-dev-setup` —
+This document describes every layer of testing available for `mac-dev-setup`,
 from automated CI to full acceptance tests on a clean machine.
 
 ---
@@ -9,7 +9,7 @@ from automated CI to full acceptance tests on a clean machine.
 
 Every pull request and push to `main` runs three jobs on GitHub Actions:
 
-### Job 1 — Lint (Ubuntu, ~7 seconds)
+### Job 1. Lint (Ubuntu, ~7 seconds)
 
 | Check | How | What it catches |
 |-------|-----|----------------|
@@ -17,14 +17,14 @@ Every pull request and push to `main` runs three jobs on GitHub Actions:
 | Secret safety scan | Regex against `secrets.template` | Real credentials accidentally committed |
 | `.gitignore` verification | Grep for `.secrets` entry | Secrets file exposed in git |
 
-### Job 2 — Formula Audit (macOS, ~30 seconds)
+### Job 2. Formula Audit (macOS, ~30 seconds)
 
 | Check | How | What it catches |
 |-------|-----|----------------|
 | Formula correctness | `brew audit --strict` | Invalid formula structure, bad depends_on |
 | Formula style | `brew style` | Ordering violations, deprecated API usage |
 
-### Job 3 — Integration Test (macOS, ~2 minutes, runs after Jobs 1 & 2)
+### Job 3. Integration Test (macOS, ~2 minutes, runs after Jobs 1 & 2)
 
 | Check | How | What it catches |
 |-------|-----|----------------|
@@ -36,8 +36,8 @@ Every pull request and push to `main` runs three jobs on GitHub Actions:
 | Tool availability | `command -v` for go, kubectl, helm, terraform, doctl, jq, gh | Package installs failing silently |
 
 **What CI does NOT cover:**
-- GUI cask installs (Cursor, Docker Desktop, GoLand, etc.) — too slow for CI
-- The full `Brewfile` — `Brewfile.ci` is a CLI-only subset
+- GUI cask installs (Cursor, Docker Desktop, GoLand, etc.). Too slow for CI
+- The full `Brewfile`. `Brewfile.ci` is a CLI-only subset
 - Interactive scripts (`setup-credentials.sh`, `setup-mcps.sh`)
 - Vim plugin installation
 - Homebrew bootstrap (runner already has Homebrew)
@@ -47,7 +47,7 @@ These gaps are covered by the acceptance testing options below.
 
 ---
 
-## Option 1 — Local Testing with `act` (Fastest)
+## Option 1. Local Testing with `act` (Fastest)
 
 [`act`](https://github.com/nektos/act) runs GitHub Actions workflows locally using Docker.
 Use this to iterate on workflow changes without pushing.
@@ -75,14 +75,14 @@ act pull_request --dryrun
 ```
 
 **Notes:**
-- `act` runs on Linux containers by default — the `lint` job works perfectly
+- `act` runs on Linux containers by default. The `lint` job works perfectly
 - The `formula-audit` and `integration` jobs require macOS and will be skipped or emulated
 - Use `act` primarily for rapid iteration on the `lint` job before pushing
-- First run downloads a Docker image (~1GB) — subsequent runs are fast
+- First run downloads a Docker image (~1GB). Subsequent runs are fast
 
 ---
 
-## Option 2 — New macOS User Account (Best Value)
+## Option 2. New macOS User Account (Best Value)
 
 Create a second user on your Mac with a clean home directory.
 This is the closest thing to a real zero-state install without any additional hardware.
@@ -118,7 +118,7 @@ This is the closest thing to a real zero-state install without any additional ha
    bash setup.sh
    ```
 
-4. Walk through the credential wizard — use dummy values or real ones.
+4. Walk through the credential wizard. Use dummy values or real ones.
 
 5. Verify the environment works as expected.
 
@@ -135,9 +135,9 @@ Choose "Delete the home folder" to fully clean up.
 
 ---
 
-## Option 3 — Manual GitHub Actions Run (Recorded & Reproducible)
+## Option 3. Manual GitHub Actions Run (Recorded & Reproducible)
 
-Add a `workflow_dispatch` trigger to run the full pipeline manually — including casks — from the GitHub UI.
+Add a `workflow_dispatch` trigger to run the full pipeline manually. Including casks. From the GitHub UI.
 This gives you a cloud-hosted, recorded acceptance test you can run before any release.
 
 **To enable:** The `release.yml` workflow already has validation gates.
@@ -171,10 +171,10 @@ A full run with casks takes ~30-45 minutes. Run manually before releases, not on
 
 ---
 
-## Option 4 — UTM macOS Virtual Machine (Best Isolation)
+## Option 4. UTM macOS Virtual Machine (Best Isolation)
 
 [UTM](https://mac.getutm.app) is a free, open-source VM manager for macOS.
-A macOS guest VM gives true clean-room testing — snapshotable and restorable.
+A macOS guest VM gives true clean-room testing. Snapshotable and restorable.
 
 **Install UTM:**
 ```bash
@@ -187,7 +187,7 @@ brew install --cask utm
 
 2. In UTM: New VM → Virtualize → macOS → select IPSW → configure RAM/disk (16GB RAM, 60GB disk recommended)
 
-3. Complete macOS setup inside the VM — create a user account, skip Apple ID
+3. Complete macOS setup inside the VM. Create a user account, skip Apple ID
 
 4. Take a **snapshot** before running setup (UTM → VM menu → Snapshot → Save):
    ```
@@ -207,10 +207,10 @@ brew install --cask utm
    ```
 
 **What this adds:**
-- True clean-room — no pre-installed tools, fresh Homebrew
-- Restorable — test as many times as you want from the same baseline
-- Architecture testing — create ARM and Intel VMs to test both
-- Offline testing — no cloud dependency
+- True clean-room. No pre-installed tools, fresh Homebrew
+- Restorable. Test as many times as you want from the same baseline
+- Architecture testing. Create ARM and Intel VMs to test both
+- Offline testing. No cloud dependency
 
 **Notes:**
 - Apple Silicon Macs can only run Apple Silicon macOS guests (not Intel macOS)
@@ -219,19 +219,19 @@ brew install --cask utm
 
 ---
 
-## Option 5 — Cloud Mac / GitHub Larger Runners (Team / Automated)
+## Option 5. Cloud Mac / GitHub Larger Runners (Team / Automated)
 
-For a fully automated, hosted clean-room test — relevant if this becomes a team setup.
+For a fully automated, hosted clean-room test. Relevant if this becomes a team setup.
 
 **GitHub Larger Runners (macOS):**
-- `macos-latest-xlarge` — Apple Silicon, 6 vCPU, 14GB RAM
+- `macos-latest-xlarge`. Apple Silicon, 6 vCPU, 14GB RAM
 - Add to a workflow with `runs-on: macos-latest-xlarge`
 - Fully clean environment, billed per minute
 - Good for release gates on a team
 
 **MacStadium / Orka:**
 - Dedicated Mac hardware in the cloud
-- Persistent VMs you control — snapshot, restore, automate
+- Persistent VMs you control. Snapshot, restore, automate
 - Relevant when this setup is used across a team
 
 **Cost estimate for a full manual install run:**
@@ -273,7 +273,7 @@ Use this checklist when running a full acceptance test (Options 2, 4, or 5):
 - [ ] `gh auth status` shows authenticated
 
 ### Shell Environment
-- [ ] Open a new terminal — prompt appears correctly
+- [ ] Open a new terminal. Prompt appears correctly
 - [ ] `repos` alias navigates to `~/Repos`
 - [ ] `k` alias works (`kubectl`)
 - [ ] `tf` alias works (`terraform`)
@@ -281,4 +281,4 @@ Use this checklist when running a full acceptance test (Options 2, 4, or 5):
 
 ### Upgrade
 - [ ] `bash scripts/upgrade.sh` runs without errors on an already-configured machine
-- [ ] Re-running `setup.sh` is idempotent — no duplicate installs or errors
+- [ ] Re-running `setup.sh` is idempotent. No duplicate installs or errors
