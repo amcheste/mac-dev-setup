@@ -92,6 +92,27 @@ Show the user the release pipeline URL and confirm the tag was pushed. Let them 
 - If the version contains `-` (e.g. `-beta.1`, `-rc.1`) it is published as a **pre-release** and will not show as the latest version
 - If it is a stable version (e.g. `1.0.0`) it becomes the **latest** release after all pipeline gates pass
 
+## Step 5 — Ensure `main` is the GitHub default branch
+
+`develop` is the integration trunk and stays the same. GitHub's "default branch" repo setting is separate — it controls landing page, `git clone` target, and PR-base UI default. The convention (see [Branching & Releases](https://github.com/amcheste/engineering-handbook/blob/develop/docs/workflows/branching-and-releases.md#github-default-branch-setting)) is:
+
+- Pre-release: GitHub default = `develop` (the only meaningful state)
+- Post-release: GitHub default = `main` (external visitors see the shipped product)
+
+Run this unconditionally at the end of the release flow. It's idempotent: on the first release it flips develop → main, on every subsequent release it's a no-op.
+
+```bash
+current=$(gh repo view --json defaultBranchRef --jq '.defaultBranchRef.name')
+if [ "$current" != "main" ]; then
+  gh repo edit --default-branch main
+  echo "GitHub default branch flipped to main (first release)."
+else
+  echo "GitHub default branch already main."
+fi
+```
+
+Contributors keep branching from and PR'ing to `develop` — only what GitHub renders on the repo landing page changes.
+
 ## Summary
 
 Tell the user:
@@ -99,3 +120,4 @@ Tell the user:
 - That the pipeline is running: validate → VM acceptance → publish
 - Where to watch it: `https://github.com/amcheste/<repo>/actions`
 - That `main` now equals the new release and `develop` is ready for the next cycle
+- If Step 5 flipped the default branch, mention it explicitly (it's the first release)
