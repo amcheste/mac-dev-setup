@@ -12,8 +12,8 @@ MAJOR.MINOR.PATCH[-PRE_RELEASE]
 
 | Component | When to increment |
 |-----------|-------------------|
-| **MAJOR** | Breaking changes — tools removed, dotfiles restructured, setup flow changed in a non-backwards-compatible way |
-| **MINOR** | New tools, new scripts, new MCP servers, new dotfile features — backwards compatible |
+| **MAJOR** | Breaking changes: tools removed, dotfiles restructured, setup flow changed in a non-backwards-compatible way |
+| **MINOR** | New tools, new scripts, new MCP servers, new dotfile features. Backwards compatible. |
 | **PATCH** | Bug fixes, documentation updates, CI improvements, dependency updates |
 | **PRE_RELEASE** | Optional suffix signalling a version is not yet mainstream stable (e.g. `-beta.1`, `-rc.2`) |
 
@@ -23,10 +23,10 @@ MAJOR.MINOR.PATCH[-PRE_RELEASE]
 
 | Version range | Meaning |
 |---------------|---------|
-| `0.x.x` | Pre-stable — actively being developed, breaking changes may occur between minor versions |
-| `1.0.0`+ | Stable — the environment has been run on a real machine and proven reliable |
-| `x.x.x-beta.N` | Beta — feature-complete for the version, but not yet fully tested |
-| `x.x.x-rc.N` | Release candidate — final testing before a stable release |
+| `0.x.x` | Pre-stable; actively being developed, breaking changes may occur between minor versions |
+| `1.0.0`+ | Stable; the environment has been run on a real machine and proven reliable |
+| `x.x.x-beta.N` | Beta; feature-complete for the version, but not yet fully tested |
+| `x.x.x-rc.N` | Release candidate; final testing before a stable release |
 
 Pre-release versions are published to GitHub Releases with the **Pre-release** flag set,
 so they never show as the "latest" release. Only stable versions become the default install.
@@ -35,7 +35,7 @@ so they never show as the "latest" release. Only stable versions become the defa
 
 ## Bumping a Version
 
-Use the bump script — it updates `VERSION`, promotes `CHANGELOG.md`, commits, and tags:
+Use the bump script. It updates `VERSION`, promotes `CHANGELOG.md`, commits, and tags:
 
 ```bash
 # Increment automatically
@@ -72,7 +72,7 @@ tag push → validate (lint + formula audit + integration test) → publish Pre-
 tag push → validate → VM acceptance test (clean macOS VM) → publish Release
 ```
 
-Pre-release versions skip the VM acceptance gate by design — they are explicitly
+Pre-release versions skip the VM acceptance gate by design. They are explicitly
 not fully vetted. The validate pipeline (shellcheck, formula audit, real macOS
 integration test) still runs and must pass for all release types.
 

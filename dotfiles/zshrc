@@ -61,3 +61,8 @@ function mkcd() {
 
 # ── Secrets (never commit this file) ─────────────────────────────────────────
 [ -f ~/.secrets ] && source ~/.secrets
+
+# ── Epsilon agent — GitHub App credentials ──────────────────────────────────
+# See https://github.com/amcheste-ai-agent/epsilon-agent for context
+export CLAUDE_GH_APP_ID="3490270"
+export CLAUDE_GH_APP_PRIVATE_KEY_PATH="$HOME/.claude/secrets/amcheste-ai-agent.pem"

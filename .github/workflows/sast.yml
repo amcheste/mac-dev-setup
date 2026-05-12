@@ -28,7 +28,8 @@ jobs:
             p/secrets
           generateSarif: "1"
 
-      - uses: github/codeql-action/upload-sarif@3b1a19a80ab047f35cbb237b5bd9bdc1e14f166c # v3
-        if: always()
+      - uses: github/codeql-action/upload-sarif@68bde559dea0fdcac2102bfdf6230c5f70eb485e # v4.35.4
+        if: always() && github.ref == 'refs/heads/main'
+        continue-on-error: true
         with:
           sarif_file: semgrep.sarif
