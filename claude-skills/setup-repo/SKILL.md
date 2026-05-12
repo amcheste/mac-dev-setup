@@ -44,14 +44,29 @@ gh api repos/<owner/repo>/git/refs \
   --field sha="$MAIN_SHA"
 ```
 
-## Step 2 — Set develop as default branch
+## Step 2 — Set the GitHub default branch (conditional on release state)
+
+Two distinct concepts: **integration trunk** (always `develop` — set in Step 1) and **GitHub's "default branch" repo setting** (a UX pointer for the landing page, `git clone` target, and PR-base UI default). They differ. See [Branching & Releases → GitHub default branch setting](https://github.com/amcheste/engineering-handbook/blob/develop/docs/workflows/branching-and-releases.md#github-default-branch-setting).
+
+The rule:
+- **No releases yet** → set GitHub default to `develop`. Nothing's shipped, so the integration state is the only meaningful state.
+- **One or more releases exist** → leave GitHub default at `main`. External visitors see the shipped product. `/publish-release` will keep it at `main` going forward.
 
 ```bash
-gh api repos/<owner/repo> \
-  --method PATCH \
-  --field default_branch=develop \
-  --jq '.default_branch'
+release_count=$(gh api "repos/<owner/repo>/releases" --jq 'length')
+if [ "$release_count" -eq 0 ]; then
+  gh api repos/<owner/repo> \
+    --method PATCH \
+    --field default_branch=develop \
+    --jq '.default_branch'
+  echo "GitHub default branch set to develop (pre-release)"
+else
+  current=$(gh api repos/<owner/repo> --jq '.default_branch')
+  echo "GitHub default branch kept as $current — repo has $release_count release(s)"
+fi
 ```
+
+The integration trunk doesn't change either way — contributors branch from and PR to `develop` regardless.
 
 ## Step 3 — Set merge policy: disable squash, default to rebase
 
@@ -192,7 +207,7 @@ Report what was configured (and any gaps that need a follow-up PR):
 
 ```
 ✓ develop branch created (or already existed)
-✓ develop set as default branch
+✓ GitHub default branch: develop (pre-release) OR main (kept — repo has releases)
 ✓ Merge policy: squash disabled, rebase + merge enabled
 ✓ develop protected — require PR + [checks]
 ✓ main protected — require PR + [checks]
