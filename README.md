@@ -4,8 +4,6 @@
 
 <div align="center">
 
-<img src="assets/logo.png" alt="mac-dev-setup mascot" width="200" />
-
 # mac-dev-setup
 
 **An agentic-forward macOS developer environment. From zero to productive in one command.**
